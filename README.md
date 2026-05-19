@@ -20,6 +20,8 @@ El sistema permite:
 - whatsapp-web.js
 - Puppeteer
 - Nodemailer
+- QRCode
+- Dashboard web local
 
 ---
 
@@ -66,6 +68,15 @@ WA_SESSION_PATH=./.wwebjs_auth
 ```bash
 npm run dev
 ```
+s
+---
+
+
+## 6. Abrir dashboard
+
+```txt
+http://localhost:3000
+```
 
 ---
 
@@ -81,12 +92,56 @@ npm run dev
 
 ---
 
+# API disponible
+
+## Estado de WhatsApp
+
+```http
+GET /api/whatsapp/status
+```
+
+Devuelve:
+- estado actual del cliente
+- QR activo si existe
+
+---
+
+## Enviar mensaje manual de prueba
+
+```http
+POST /api/messages/test-send
+```
+
+Body:
+
+```json
+{
+  "phone": "+34600111222",
+  "message": "Mensaje de prueba"
+}
+```
+
+---
+
 # Estado actual
 
 ## Fase 1
 - [x] Setup TypeScript
-- [x] Configuración ESLint + Prettier
-- [x] Configuración variables de entorno
-- [x] Servidor Express base
-- [x] Configuración SQLite inicial
-- [x] Schema de tablas inicial
+- [x] ESLint + Prettier
+- [x] Variables de entorno
+- [x] Express.js
+- [x] SQLite
+
+## Fase 2
+- [x] Integración WhatsApp Web
+- [x] Persistencia de sesión
+- [x] QR en consola y dashboard
+- [x] Dashboard local básico
+- [x] API REST básica
+- [x] Envío manual de mensajes
+- [ ] Reconexión automática
+- [ ] Scheduler
+- [ ] Sistema ACK
+- [ ] Alertas email
+
+
