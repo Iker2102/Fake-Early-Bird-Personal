@@ -4,7 +4,7 @@
 
 - [x] Definir arquitectura general
 - [x] Elegir stack tecnológico
-- [ ] Inicializar proyecto Node.js + TypeScript
+- [x] Inicializar proyecto Node.js + TypeScript
 - [ ] Configurar ESLint + Prettier
 - [ ] Crear estructura de carpetas (`src/whatsapp`, `src/scheduler`, `src/email`, `src/db`, `src/api`, `src/dashboard`)
 - [ ] Configurar y validar variables de entorno (fail-fast al arrancar)
@@ -54,14 +54,14 @@
 - [ ] Al enviar, registrar `messageId` de WhatsApp en BD para correlacionar el ACK
 - [ ] Iniciar temporizador de `DELIVERY_TIMEOUT_MINUTES` tras el envío
 - [ ] Si llega `ACK_DEVICE (2)` o superior dentro del timeout:
-  - [ ] Actualizar BD: `status=delivered`, `deliveredAt`, `ackLevel`
-  - [ ] Enviar email de confirmación si `NOTIFY_ON_SUCCESS=true`
+    - [ ] Actualizar BD: `status=delivered`, `deliveredAt`, `ackLevel`
+    - [ ] Enviar email de confirmación si `NOTIFY_ON_SUCCESS=true`
 - [ ] Si expira el timeout sin `ACK_DEVICE`:
-  - [ ] Actualizar BD: `status=delivery_failed`, `failReason=timeout`
-  - [ ] Disparar email de alerta inmediatamente
+    - [ ] Actualizar BD: `status=delivery_failed`, `failReason=timeout`
+    - [ ] Disparar email de alerta inmediatamente
 - [ ] Si `message_ack` devuelve error explícito:
-  - [ ] Actualizar BD: `status=failed`, `failReason=<error>`
-  - [ ] Disparar retry si `retryCount < RETRY_MAX`, si no → email de alerta
+    - [ ] Actualizar BD: `status=failed`, `failReason=<error>`
+    - [ ] Disparar retry si `retryCount < RETRY_MAX`, si no → email de alerta
 
 ---
 

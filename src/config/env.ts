@@ -17,5 +17,5 @@ export const env = {
 
     DB_PATH: requireEnv("DB_PATH"),
 
-    WA_SESSION_PATH: requireEnv("WA_SESSION_PATH")
+    WA_SESSION_PATH: requireEnv("WA_SESSION_PATH"),
 };
