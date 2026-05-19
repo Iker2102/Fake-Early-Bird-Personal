@@ -7,9 +7,9 @@
 - [x] Inicializar proyecto Node.js + TypeScript
 - [x] Configurar ESLint + Prettier
 - [x] Crear estructura de carpetas (`src/whatsapp`, `src/scheduler`, `src/email`, `src/db`, `src/api`, `src/dashboard`)
-- [ ] Configurar y validar variables de entorno (fail-fast al arrancar)
-- [ ] Configurar SQLite con `better-sqlite3`
-- [ ] Crear schema inicial de BD (tablas `scheduled_messages`, `contacts`, `email_logs`)
+- [x] Configurar y validar variables de entorno (fail-fast al arrancar)
+- [x] Configurar SQLite con `better-sqlite3`
+- [x] Crear schema inicial de BD (tablas `scheduled_messages`, `contacts`, `email_logs`)
 
 ---
 
