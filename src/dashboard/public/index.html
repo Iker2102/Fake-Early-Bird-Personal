@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Fake Early Bird</title>
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+    <body>
+        <main class="container">
+            <h1>Fake Early Bird</h1>
+
+            <section class="card">
+                <h2>Estado WhatsApp</h2>
+                <p id="wa-status">Cargando...</p>
+                <img id="qr" alt="QR de WhatsApp" />
+            </section>
+
+            <section class="card">
+                <h2>Enviar mensaje de prueba</h2>
+
+                <form id="send-form">
+                    <label>
+                        Teléfono
+                        <input
+                            type="text"
+                            id="phone"
+                            placeholder="+34600111222"
+                            required
+                        />
+                    </label>
+
+                    <label>
+                        Mensaje
+                        <textarea
+                            id="message"
+                            placeholder="Escribe el mensaje..."
+                            required
+                        ></textarea>
+                    </label>
+
+                    <button type="submit">Enviar mensaje</button>
+                </form>
+
+                <p id="status"></p>
+            </section>
+        </main>
+
+        <script src="./app.js"></script>
+    </body>
+</html>
