@@ -5,7 +5,7 @@ import { env } from "../config/env.js";
 
 const { Client, LocalAuth } = pkg;
 
-let whatsappClient: InstanceType<typeof Client> | null = null;
+export let whatsappClient: InstanceType<typeof Client> | null = null;
 let isInitializing = false;
 
 /**
@@ -37,7 +37,7 @@ export async function initializeWhatsAppClient(): Promise<void> {
         console.log("WhatsApp autenticado correctamente");
     });
 
-    whatsappClient.on("ready", () => {
+    whatsappClient.on("ready", async () => {
         console.log("WhatsApp conectado y listo");
     });
 
