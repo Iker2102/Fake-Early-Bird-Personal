@@ -3,7 +3,7 @@ import express from "express";
 import { env } from "./config/env.js";
 import { initializeDatabase } from "./db/schema.js";
 import { destroyWhatsAppClient, initializeWhatsAppClient } from "./whatsapp/client.js";
-import { sendManualMessage } from "./whatsapp/sender.js";
+import { apiRouter } from "./api/routes.js";
 
 const app = express();
 
@@ -15,11 +15,6 @@ initializeDatabase();
 /**
  * Inicia el cliente de WhatsApp
  */
-
-// Solo para prueba manual. QUITAR después
-setTimeout(async () => {
-    await sendManualMessage("+34NUMERO", "Mensaje de prueba desde Fake Early Bird");
-}, 10000);
 
 await initializeWhatsAppClient();
 
@@ -42,6 +37,10 @@ process.on("unhandledRejection", (reason) => {
 process.on("uncaughtException", (error) => {
     console.error("Uncaught exception:", error);
 });
+
+
+app.use(express.json());
+app.use("/api", apiRouter);
 
 /**
  * Endpoint para comprobar el estado de la aplicación
