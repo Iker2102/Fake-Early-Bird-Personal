@@ -5,6 +5,7 @@ dist/
 .env
 
 .wwebjs_auth/
+.wwebjs_cache/
 
 data/*.db
 data/*.db-journal
