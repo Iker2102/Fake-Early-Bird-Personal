@@ -2,6 +2,7 @@ services:
   fake-early-bird:
     build: .
     container_name: fake-early-bird-dev
+    init: true
     ports:
       - "3000:3000"
     env_file:
@@ -9,8 +10,13 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - ./.wwebjs_auth:/app/.wwebjs_auth
-      - ./.wwebjs_cache:/app/.wwebjs_cache
       - ./data:/app/data
-    command: npm run dev
+      - wwebjs_auth_dev:/app/.wwebjs_auth
+      - wwebjs_cache_dev:/app/.wwebjs_cache
+    command: npm run dev:docker
     restart: unless-stopped
+    stop_grace_period: 15s
+
+volumes:
+  wwebjs_auth_dev:
+  wwebjs_cache_dev:

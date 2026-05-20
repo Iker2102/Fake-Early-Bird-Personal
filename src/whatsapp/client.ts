@@ -5,7 +5,15 @@ import pkg from "whatsapp-web.js";
 
 import { env } from "../config/env.js";
 
+import { sendDisconnectAlertEmail } from "../email/mailer.js";
+
+import { countPendingMessages } from "../db/repositories/scheduledMessageRepository.js";
+
 const { Client, LocalAuth } = pkg;
+
+
+
+let isWhatsAppReady = false;
 
 /**
  * Instancia global del cliente de WhatsApp Web
@@ -92,6 +100,7 @@ whatsappClient.on("ready", () => {
     whatsappStatus = "ready";
     currentQr = null;
     reconnectAttempts = 0;
+    isWhatsAppReady = true;
 
     console.log("WhatsApp conectado y listo");
 });
@@ -99,9 +108,19 @@ whatsappClient.on("ready", () => {
 /**
  * Evento lanzado cuando ocurre un fallo de autenticación
  */
-whatsappClient.on("auth_failure", (message) => {
+whatsappClient.on("auth_failure", async (message) => {
     whatsappStatus = "auth_failure";
+    isWhatsAppReady = false;
+
+    const pendingMessages = countPendingMessages();
+
+    if (pendingMessages > 0) {
+        await sendDisconnectAlertEmail(`auth_failure: ${message}`, pendingMessages);
+    }
+
     console.error("Error de autenticación:", message);
+
+
     scheduleReconnect();
 });
 
@@ -111,6 +130,13 @@ whatsappClient.on("auth_failure", (message) => {
 whatsappClient.on("disconnected", async (reason) => {
     whatsappStatus = "disconnected";
     currentQr = null;
+    isWhatsAppReady = false;
+
+    const pendingMessages = countPendingMessages();
+
+    if (pendingMessages > 0) {
+        await sendDisconnectAlertEmail(reason, pendingMessages);
+    }
 
     console.warn("WhatsApp desconectado:", reason);
 
@@ -131,35 +157,7 @@ whatsappClient.on("disconnected", async (reason) => {
     }
 }
 
-/**
- * Cierra correctamente el cliente de WhatsApp y libera Puppeteer
- * @returns 
- */
-export async function destroyWhatsAppClient(): Promise<void> {
-    if (!whatsappClient) {
-        return;
-    }
 
-    try {
-        await whatsappClient.destroy();
-    } catch (error) {
-        console.error("Error cerrando cliente de WhatsApp:", error);
-    } finally {
-        whatsappClient = null;
-        isInitializing = false;
-    }
-}
-
-/**
- * Devuelve el estado actual de WhatsApp y el QR activo si existe
- * @returns 
- */
-export function getWhatsAppStatus() {
-    return {
-        status: whatsappStatus,
-        qr: currentQr,
-    };
-}
 
 /**
  * Programa una reconexión automática usando backoff exponencial
@@ -186,4 +184,41 @@ function scheduleReconnect(): void {
             scheduleReconnect();
         }
     }, delayMs);
+}
+
+
+
+/**
+ * Cierra correctamente el cliente de WhatsApp y libera Puppeteer
+ * @returns 
+ */
+export async function destroyWhatsAppClient(): Promise<void> {
+    if (!whatsappClient) {
+        return;
+    }
+
+    try {
+        await whatsappClient.destroy();
+    } catch (error) {
+        console.error("Error cerrando cliente de WhatsApp:", error);
+    } finally {
+        whatsappClient = null;
+        isInitializing = false;
+        isWhatsAppReady = false;
+    }
+}
+
+/**
+ * Devuelve el estado actual de WhatsApp y el QR activo si existe
+ * @returns 
+ */
+export function getWhatsAppStatus() {
+    return {
+        status: whatsappStatus,
+        qr: currentQr,
+    };
+}
+
+export function isClientReady(): boolean {
+    return Boolean(whatsappClient && isWhatsAppReady);
 }

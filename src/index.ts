@@ -7,6 +7,8 @@ import { env } from "./config/env.js";
 import { initializeDatabase } from "./db/schema.js";
 import { destroyWhatsAppClient, initializeWhatsAppClient } from "./whatsapp/client.js";
 
+import { verifyEmailTransport } from "./email/mailer.js";
+
 import { startScheduler } from "./scheduler/cron.js";
 
 const app = express();
@@ -14,15 +16,29 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+let isShuttingDown = false;
+
 /**
  * Inicializa la base de datos SQLite y crea las tablas necesarias
  */
 initializeDatabase();
 
+await verifyEmailTransport();
+
 /**
  * Inicializa el cliente de WhatsApp Web
  */
-await initializeWhatsAppClient();
+
+if (env.WA_ENABLED) {
+    await initializeWhatsAppClient();
+} else {
+    console.log("WhatsApp desactivado por configuración");
+}
+
+/**
+ * Inicializa el scheduler
+ */
+startScheduler();
 
 /**
  * Permite recibir peticiones JSON en la API
@@ -99,4 +115,27 @@ app.get("/health", (_req, res) => {
  */
 app.listen(env.PORT, () => {
     console.log(`Fake Early Bird running on port ${env.PORT}`);
+});
+
+
+async function shutdown(): Promise<void> {
+    if (isShuttingDown) {
+        return;
+    }
+
+    isShuttingDown = true;
+
+    console.log("Cerrando aplicación...");
+
+    await destroyWhatsAppClient();
+
+    process.exit(0);
+}
+
+process.on("SIGINT", () => {
+    void shutdown();
+});
+
+process.on("SIGTERM", () => {
+    void shutdown();
 });

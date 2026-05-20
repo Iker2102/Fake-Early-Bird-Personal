@@ -20,7 +20,7 @@
 - [x] Generar y mostrar QR en consola y dashboard
 - [x] Detectar estado: `qr`, `ready`, `authenticated`, `disconnected`
 - [x] Implementar reconexión automática con backoff exponencial
-- [ ] Disparar email de alerta si se detecta `auth_failure` o `disconnected` con mensajes en cola
+- [x] Disparar email de alerta si se detecta `auth_failure` o `disconnected` con mensajes en cola
 - [x] Probar envío manual simple a número de prueba
 
 ---
@@ -67,12 +67,12 @@
 
 ## Fase 6 - Módulo de Email (Nodemailer + SMTP) ⭐ NUEVO
 
-- [ ] Instalar `nodemailer` + `@types/nodemailer`
-- [ ] Configurar transporte SMTP con credenciales de `.env` (`smtp.mardev.es`)
-- [ ] Test de conexión SMTP al arrancar (`transporter.verify()`) con log de resultado
+- [x] Instalar `nodemailer` + `@types/nodemailer`
+- [-] Configurar transporte SMTP con credenciales de `.env` (`smtp.mardev.es`)
+- [-] Test de conexión SMTP al arrancar (`transporter.verify()`) con log de resultado
 - [ ] Implementar cola de emails independiente (no bloquea scheduler principal)
 - [ ] Retry de emails fallidos (3 intentos, backoff 1min/5min/15min)
-- [ ] Registrar cada intento de email en tabla `email_logs`
+- [x] Registrar cada intento de email en tabla `email_logs`
 
 ### Templates HTML a implementar
 
@@ -123,7 +123,7 @@
 
 - [ ] Middleware Express: rechazar peticiones que no vengan de `127.0.0.1`
 - [ ] Validar y sanitizar todos los inputs de la API
-- [ ] `.env` en `.gitignore` (y también sesión WA y BD)
+- [x] `.env` en `.gitignore` (y también sesión WA y BD)
 - [ ] Logs sanitizados: nunca loggear passwords, tokens ni contenido de mensajes en producción
 - [ ] Manejo de errores global (Express error handler + proceso `uncaughtException`)
 
@@ -144,8 +144,8 @@
 - [ ] Configuración PM2 (`ecosystem.config.js`) con restart automático
 - [ ] Script `install.sh` (instala deps, crea `.env` de ejemplo, inicia PM2)
 - [ ] Dockerfile opcional (Node + Chromium para Puppeteer)
-- [ ] `docker-compose.yml` opcional con volúmenes para sesión y BD
-- [ ] `README.md` con guía de instalación y primer QR scan
+- [x] `docker-compose.yml` opcional con volúmenes para sesión y BD
+- [x] `README.md` con guía de instalación y primer QR scan
 - [ ] Configuración de inicio al arrancar sistema (systemd / Windows Task Scheduler)
 
 ---

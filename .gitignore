@@ -7,6 +7,9 @@ dist/
 .wwebjs_auth/
 .wwebjs_cache/
 
+.wwebjs_auth_docker
+.wwebjs_cache_docker
+
 data/*.db
 data/*.db-journal
 data/*.db-wal
@@ -19,3 +22,9 @@ logs/
 Thumbs.db
 
 .vscode/
+
+dist/
+
+docker-data/
+
+*.sqlite

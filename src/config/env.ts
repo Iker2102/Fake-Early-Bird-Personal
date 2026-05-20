@@ -59,4 +59,37 @@ export const env = {
     WORK_HOURS_START: getNumberEnv("WORK_HOURS_START", 8),
     WORK_HOURS_END: getNumberEnv("WORK_HOURS_END", 19),
     HOLIDAYS: requireEnv("HOLIDAYS").split(",").map((holiday) => holiday.trim()).filter(Boolean),
+    SMTP_HOST: requireEnv("SMTP_HOST"),
+    SMTP_PORT: getNumberEnv("SMTP_PORT", 465),
+    SMTP_SECURE: getBooleanEnv("SMTP_SECURE", true),
+
+    SMTP_USER: requireEnv("SMTP_USER"),
+    SMTP_PASS: requireEnv("SMTP_PASS"),
+    SMTP_FROM: requireEnv("SMTP_FROM"),
+
+    NOTIFY_EMAIL: requireEnv("NOTIFY_EMAIL"),
+    NOTIFY_ON_DISCONNECT: getBooleanEnv("NOTIFY_ON_DISCONNECT", true),
+
+    WA_ENABLED: getBooleanEnv("WA_ENABLED", true),
 };
+
+
+/**
+ * Obtiene una variable de entorno booleana
+ * @param name 
+ * @param defaultValue 
+ * @returns 
+ */
+function getBooleanEnv(name: string, defaultValue?: boolean): boolean {
+    const rawValue = process.env[name];
+
+    if (!rawValue && defaultValue !== undefined) {
+        return defaultValue;
+    }
+
+    if (!rawValue) {
+        throw new Error(`Falta la variable de entorno requerida: ${name}`);
+    }
+
+    return rawValue === "true";
+}

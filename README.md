@@ -205,7 +205,7 @@ GET /api/messages
 - [x] API REST básica
 - [x] Envío manual de mensajes
 - [x] Reconexión automática con backoff exponencial
-- [ ] Alertas email
+- [x] Alertas email
 
 ## Fase 3
 - [x] Instalar node-cron
@@ -214,7 +214,7 @@ GET /api/messages
 - [x] Cola básica con SQLite
 - [x] Endpoint para crear mensajes programados
 - [x] Endpoint para listar mensajes programados
-- [ ] Horario laboral configurable
-- [ ] Fines de semana y festivos
-- [ ] Timezone
+- [x] Horario laboral configurable
+- [-] Fines de semana y festivos
+- [x] Timezone
 - [ ] Prevención avanzada de duplicados

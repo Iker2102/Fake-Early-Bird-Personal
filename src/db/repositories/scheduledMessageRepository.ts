@@ -185,3 +185,21 @@ export function markMessageAsFailed(id: string, reason: string): void {
         )
         .run(reason, id);
 }
+
+/**
+ * Cuenta los mensajes pendientes en cola
+ * @returns 
+ */
+export function countPendingMessages(): number {
+    const result = database
+        .prepare(
+            `
+            SELECT COUNT(*) as total
+            FROM scheduled_messages
+            WHERE status = 'scheduled'
+            `
+        )
+        .get() as { total: number };
+
+    return result.total;
+}

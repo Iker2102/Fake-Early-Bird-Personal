@@ -9,14 +9,23 @@ import {
 } from "../db/repositories/scheduledMessageRepository.js";
 import { sendManualMessage } from "../whatsapp/sender.js";
 
+import { isClientReady } from "../whatsapp/client.js";
+
 let isProcessingQueue = false;
 
 /**
- * Procesa la cola de mensajes pendientes.
+ * Procesa la cola de mensajes pendientes
+ * @returns 
  */
 async function processScheduledMessages(): Promise<void> {
 
     const currentDate = getCurrentDateInTimezone();
+
+
+    if (!isClientReady()) {
+        console.log("Scheduler pausado: WhatsApp no está listo");
+        return;
+    }
 
     if (isProcessingQueue) {
         console.log("La cola ya se está procesando");
@@ -49,6 +58,11 @@ async function processScheduledMessages(): Promise<void> {
             } catch (error) {
                 const reason = error instanceof Error ? error.message : "Error desconocido";
 
+                if (reason === "WHATSAPP_NOT_READY") {
+                    console.log("WhatsApp no está listo, el mensaje seguirá en cola");
+                    continue;
+                }
+
                 markMessageAsFailed(message.id, reason);
             }
         }
@@ -58,7 +72,7 @@ async function processScheduledMessages(): Promise<void> {
 }
 
 /**
- * Inicia el job principal del scheduler.
+ * Inicia el job principal del scheduler
  */
 export function startScheduler(): void {
     cron.schedule("* * * * *", () => {

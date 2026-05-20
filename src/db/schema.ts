@@ -60,6 +60,20 @@ export function initializeDatabase(): void {
             FOREIGN KEY (messageId)
                 REFERENCES scheduled_messages(id)
         );
+
+        CREATE TABLE IF NOT EXISTS email_logs (
+            id TEXT PRIMARY KEY,
+
+            recipient TEXT NOT NULL,
+
+            subject TEXT NOT NULL,
+
+            status TEXT NOT NULL,
+
+            errorMessage TEXT,
+            
+            createdAt TEXT NOT NULL
+        );
     `);
 
     console.log("Database schema initialized");
