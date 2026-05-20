@@ -19,7 +19,7 @@
 - [x] Inicializar cliente con sesión persistente (`.wwebjs_auth/`)
 - [x] Generar y mostrar QR en consola y dashboard
 - [x] Detectar estado: `qr`, `ready`, `authenticated`, `disconnected`
-- [ ] Implementar reconexión automática con backoff exponencial
+- [x] Implementar reconexión automática con backoff exponencial
 - [ ] Disparar email de alerta si se detecta `auth_failure` o `disconnected` con mensajes en cola
 - [x] Probar envío manual simple a número de prueba
 
@@ -27,13 +27,13 @@
 
 ## Fase 3 - Scheduler y Cola
 
-- [ ] Instalar `node-cron`
-- [ ] Job principal: cada minuto revisa mensajes en estado `scheduled` cuya `scheduledAt` ya pasó
-- [ ] Mutex/lock para evitar procesamiento simultáneo
+- [x] Instalar `node-cron`
+- [x] Job principal: cada minuto revisa mensajes en estado `scheduled` cuya `scheduledAt` ya pasó
+- [x] Mutex/lock para evitar procesamiento simultáneo
 - [ ] Respetar horario laboral configurable (`WORK_HOURS_START/END`)
 - [ ] Detectar fin de semana y festivos → reprogramar al siguiente día hábil
 - [ ] Manejo de timezone (configurar con `TZ` en `.env`)
-- [ ] Prevención de duplicados por ID único antes de encolar
+- [x] Prevención de duplicados por ID único antes de encolar
 
 ---
 

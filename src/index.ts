@@ -7,6 +7,8 @@ import { env } from "./config/env.js";
 import { initializeDatabase } from "./db/schema.js";
 import { destroyWhatsAppClient, initializeWhatsAppClient } from "./whatsapp/client.js";
 
+import { startScheduler } from "./scheduler/cron.js";
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);

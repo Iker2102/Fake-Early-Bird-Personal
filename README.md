@@ -59,6 +59,8 @@ Crear archivo `.env`:
 PORT=3000
 DB_PATH=./data/app.db
 WA_SESSION_PATH=./.wwebjs_auth
+WA_RECONNECT_MAX_ATTEMPTS=5
+WA_RECONNECT_BASE_DELAY_SECONDS=5
 ```
 
 ---
@@ -162,6 +164,26 @@ Body:
 }
 ```
 
+
+```http
+POST /api/messages
+```
+
+```json
+{
+  "phone": "+34600111222",
+  "message": "Mensaje de prueba",
+  "scheduledAt": "2026-05-20T06:35:00.000Z"
+}
+```
+
+
+## Listar mensajes programados
+
+```http
+GET /api/messages
+```
+
 ---
 
 # Estado actual
@@ -172,6 +194,8 @@ Body:
 - [x] Variables de entorno
 - [x] Express.js
 - [x] SQLite
+- [x] Docker básico
+- [x] Docker development con hot reload
 
 ## Fase 2
 - [x] Integración WhatsApp Web
@@ -180,9 +204,17 @@ Body:
 - [x] Dashboard local básico
 - [x] API REST básica
 - [x] Envío manual de mensajes
-- [ ] Reconexión automática
-- [ ] Scheduler
-- [ ] Sistema ACK
+- [x] Reconexión automática con backoff exponencial
 - [ ] Alertas email
 
-
+## Fase 3
+- [x] Instalar node-cron
+- [x] Job principal: revisar mensajes scheduled cuya fecha ya pasó
+- [x] Mutex/lock para evitar procesamiento simultáneo
+- [x] Cola básica con SQLite
+- [x] Endpoint para crear mensajes programados
+- [x] Endpoint para listar mensajes programados
+- [ ] Horario laboral configurable
+- [ ] Fines de semana y festivos
+- [ ] Timezone
+- [ ] Prevención avanzada de duplicados

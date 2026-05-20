@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { getWhatsAppStatus } from "../whatsapp/client.js";
 import { sendManualMessage } from "../whatsapp/sender.js";
+import { createScheduledMessage, findScheduledMessages, } from "../db/repositories/scheduledMessageRepository.js";
 
 export const apiRouter = Router();
 
@@ -44,4 +45,34 @@ apiRouter.post("/messages/test-send", async (req, res) => {
  */
 apiRouter.get("/whatsapp/status", (_req, res) => {
     res.json(getWhatsAppStatus());
+});
+
+/**
+ * Crea un mensaje programado y lo guarda en la cola.
+ */
+apiRouter.post("/messages", (req, res) => {
+    const { phone, contactName, message, scheduledAt } = req.body ?? {};
+
+    if (!phone || !message || !scheduledAt) {
+        res.status(400).json({
+            error: "phone, message y scheduledAt son obligatorios",
+        });
+        return;
+    }
+
+    const scheduledMessage = createScheduledMessage({
+        phone,
+        contactName,
+        message,
+        scheduledAt,
+    });
+
+    res.status(201).json(scheduledMessage);
+});
+
+/**
+ * Lista todos los mensajes programados.
+ */
+apiRouter.get("/messages", (_req, res) => {
+    res.json(findScheduledMessages());
 });

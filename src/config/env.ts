@@ -53,4 +53,6 @@ export const env = {
     PORT: getNumberEnv("PORT", 3000),
     DB_PATH: requireEnv("DB_PATH"),
     WA_SESSION_PATH: requireEnv("WA_SESSION_PATH"),
+    WA_RECONNECT_MAX_ATTEMPTS: getNumberEnv("WA_RECONNECT_MAX_ATTEMPTS", 5),
+    WA_RECONNECT_BASE_DELAY_SECONDS: getNumberEnv("WA_RECONNECT_BASE_DELAY_SECONDS", 5),
 };

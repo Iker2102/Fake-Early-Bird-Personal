@@ -28,6 +28,9 @@ let currentQr: string | null = null;
  */
 let whatsappStatus = "initializing";
 
+let reconnectAttempts = 0;
+let reconnectTimeout: NodeJS.Timeout | null = null;
+
 /**
  * Crea e inicializa el cliente principal de WhatsApp Web.
  *
@@ -45,71 +48,75 @@ export async function initializeWhatsAppClient(): Promise<void> {
     whatsappClient = new Client({
         authStrategy: new LocalAuth({
             dataPath: env.WA_SESSION_PATH,
-        }),
-        puppeteer: {
-            headless: true,
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-            args: [
+    }),
+    puppeteer: {
+        headless: true,
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+        args: [
                 "--no-sandbox",
                 "--disable-setuid-sandbox",
                 "--disable-dev-shm-usage",
-            ],
-        },
+        ],
+    },
+});
+
+/**
+ * Evento lanzado cuando WhatsApp genera un nuevo QR
+ */
+whatsappClient.on("qr", async (qr) => {
+    whatsappStatus = "qr";
+
+    console.log("Escanea este QR con WhatsApp:");
+
+    qrcode.generate(qr, {
+        small: true,
     });
 
-    /**
-     * Evento lanzado cuando WhatsApp genera un nuevo QR
-     */
-    whatsappClient.on("qr", async (qr) => {
-        whatsappStatus = "qr";
+    currentQr = await QRCode.toDataURL(qr);
+});
 
-        console.log("Escanea este QR con WhatsApp:");
+/**
+ * Evento lanzado cuando la sesión ha sido autenticada correctamente
+ */
+whatsappClient.on("authenticated", () => {
+    whatsappStatus = "authenticated";
+    currentQr = null;
 
-        qrcode.generate(qr, {
-            small: true,
-        });
+    console.log("WhatsApp autenticado correctamente");
+});
 
-        currentQr = await QRCode.toDataURL(qr);
-    });
+/**
+ * Evento lanzado cuando el cliente esta completamente listo
+ */
+whatsappClient.on("ready", () => {
+    whatsappStatus = "ready";
+    currentQr = null;
+    reconnectAttempts = 0;
 
-    /**
-     * Evento lanzado cuando la sesión ha sido autenticada correctamente
-     */
-    whatsappClient.on("authenticated", () => {
-        whatsappStatus = "authenticated";
-        currentQr = null;
+    console.log("WhatsApp conectado y listo");
+});
 
-        console.log("WhatsApp autenticado correctamente");
-    });
+/**
+ * Evento lanzado cuando ocurre un fallo de autenticación
+ */
+whatsappClient.on("auth_failure", (message) => {
+    whatsappStatus = "auth_failure";
+    console.error("Error de autenticación:", message);
+    scheduleReconnect();
+});
 
-    /**
-     * Evento lanzado cuando el cliente esta completamente listo
-     */
-    whatsappClient.on("ready", () => {
-        whatsappStatus = "ready";
-        currentQr = null;
+/**
+ * Evento lanzado cuando WhatsApp se desconecta
+ */
+whatsappClient.on("disconnected", async (reason) => {
+    whatsappStatus = "disconnected";
+    currentQr = null;
 
-        console.log("WhatsApp conectado y listo");
-    });
+    console.warn("WhatsApp desconectado:", reason);
 
-    /**
-     * Evento lanzado cuando ocurre un fallo de autenticación
-     */
-    whatsappClient.on("auth_failure", (message) => {
-        console.error("Error de autenticación:", message);
-    });
-
-    /**
-     * Evento lanzado cuando WhatsApp se desconecta
-     */
-    whatsappClient.on("disconnected", async (reason) => {
-        whatsappStatus = "disconnected";
-        currentQr = null;
-
-        console.warn("WhatsApp desconectado:", reason);
-
-        await destroyWhatsAppClient();
-    });
+    await destroyWhatsAppClient();
+    scheduleReconnect();   
+});
 
     try {
         await whatsappClient.initialize();
@@ -150,4 +157,30 @@ export function getWhatsAppStatus() {
         status: whatsappStatus,
         qr: currentQr,
     };
+}
+
+/**
+ * Programa una reconexión automática usando backoff exponencial.
+ */
+function scheduleReconnect(): void {
+    if (reconnectAttempts >= env.WA_RECONNECT_MAX_ATTEMPTS) {
+        console.error("Número máximo de intentos de reconexión alcanzado");
+        return;
+    }
+
+    reconnectAttempts++;
+
+    const delayMs =
+        env.WA_RECONNECT_BASE_DELAY_SECONDS * 1000 * Math.pow(2, reconnectAttempts - 1);
+
+    console.log(`Reintentando conexión de WhatsApp en ${delayMs / 1000} segundos...`);
+
+    reconnectTimeout = setTimeout(async () => {
+        try {
+            await initializeWhatsAppClient();
+        } catch (error) {
+            console.error("Error durante la reconexión de WhatsApp:", error);
+            scheduleReconnect();
+        }
+    }, delayMs);
 }
