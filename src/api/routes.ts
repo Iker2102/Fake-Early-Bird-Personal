@@ -48,7 +48,7 @@ apiRouter.get("/whatsapp/status", (_req, res) => {
 });
 
 /**
- * Crea un mensaje programado y lo guarda en la cola.
+ * Crea un mensaje programado y lo guarda en la cola
  */
 apiRouter.post("/messages", (req, res) => {
     const { phone, contactName, message, scheduledAt } = req.body ?? {};
@@ -71,7 +71,7 @@ apiRouter.post("/messages", (req, res) => {
 });
 
 /**
- * Lista todos los mensajes programados.
+ * Lista todos los mensajes programados
  */
 apiRouter.get("/messages", (_req, res) => {
     res.json(findScheduledMessages());

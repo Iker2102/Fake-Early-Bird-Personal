@@ -2,8 +2,14 @@ import { randomUUID } from "crypto";
 
 import { database } from "../database.js";
 
+/**
+ * Estados disponibles en un mensaje programado
+ */
 export type ScheduledMessageStatus = "scheduled" | "sending" | "sent" | "failed";
 
+/**
+ * Representa el mensaje programado alamcenado en la base de datos
+ */
 export type ScheduledMessage = {
     id: string;
     phone: string;
@@ -20,6 +26,9 @@ export type ScheduledMessage = {
     failReason: string | null;
 };
 
+/**
+ * Datos necesarios para crear un mensaje
+ */
 export type CreateScheduledMessageInput = {
     phone: string;
     contactName?: string | null;
@@ -27,6 +36,11 @@ export type CreateScheduledMessageInput = {
     scheduledAt: string;
 };
 
+/**
+ * Crea un mensaje programado y lo guarda en el estado inicial
+ * @param input
+ * @returns 
+ */
 export function createScheduledMessage(input: CreateScheduledMessageInput): ScheduledMessage {
     const now = new Date().toISOString();
 
@@ -85,6 +99,10 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
     return message;
 }
 
+/**
+ * Devuelve todos los mensajes programados ordenados por fecha de envío
+ * @returns 
+ */
 export function findScheduledMessages(): ScheduledMessage[] {
     return database
         .prepare(
@@ -97,6 +115,11 @@ export function findScheduledMessages(): ScheduledMessage[] {
         .all() as ScheduledMessage[];
 }
 
+/**
+ * Devuelve los mensajes pendientes cuya fecha programada ya pasó
+ * @param now 
+ * @returns 
+ */
 export function findDueScheduledMessages(now: string): ScheduledMessage[] {
     return database
         .prepare(
@@ -111,6 +134,10 @@ export function findDueScheduledMessages(now: string): ScheduledMessage[] {
         .all(now) as ScheduledMessage[];
 }
 
+/**
+ * Marca un mensaje como en proceso de envío
+ * @param id 
+ */
 export function markMessageAsSending(id: string): void {
     database
         .prepare(
@@ -123,6 +150,10 @@ export function markMessageAsSending(id: string): void {
         .run(id);
 }
 
+/**
+ * Marca un mensaje como enviado correctamente
+ * @param id 
+ */
 export function markMessageAsSent(id: string): void {
     database
         .prepare(
@@ -136,6 +167,11 @@ export function markMessageAsSent(id: string): void {
         .run(new Date().toISOString(), id);
 }
 
+/**
+ * Marca un mensaje como fallido y registra el motivo del error
+ * @param id 
+ * @param reason 
+ */
 export function markMessageAsFailed(id: string, reason: string): void {
     database
         .prepare(

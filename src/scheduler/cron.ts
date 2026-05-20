@@ -1,4 +1,5 @@
 import cron from "node-cron";
+import { getCurrentDateInTimezone, isWeekend, isWithinWorkHours } from "./workTime.js";
 
 import {
     findDueScheduledMessages,
@@ -14,8 +15,21 @@ let isProcessingQueue = false;
  * Procesa la cola de mensajes pendientes.
  */
 async function processScheduledMessages(): Promise<void> {
+
+    const currentDate = getCurrentDateInTimezone();
+
     if (isProcessingQueue) {
         console.log("La cola ya se está procesando");
+        return;
+    }
+
+    if (isWeekend(currentDate)) {
+        console.log("Scheduler pausado: fin de semana");
+        return;
+    }
+
+    if (!isWithinWorkHours(currentDate)) {
+        console.log("Scheduler pausado: fuera del horario laboral");
         return;
     }
 

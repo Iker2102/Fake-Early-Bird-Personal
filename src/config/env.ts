@@ -55,4 +55,8 @@ export const env = {
     WA_SESSION_PATH: requireEnv("WA_SESSION_PATH"),
     WA_RECONNECT_MAX_ATTEMPTS: getNumberEnv("WA_RECONNECT_MAX_ATTEMPTS", 5),
     WA_RECONNECT_BASE_DELAY_SECONDS: getNumberEnv("WA_RECONNECT_BASE_DELAY_SECONDS", 5),
+    TZ: requireEnv("TZ"),
+    WORK_HOURS_START: getNumberEnv("WORK_HOURS_START", 8),
+    WORK_HOURS_END: getNumberEnv("WORK_HOURS_END", 19),
+    HOLIDAYS: requireEnv("HOLIDAYS").split(",").map((holiday) => holiday.trim()).filter(Boolean),
 };

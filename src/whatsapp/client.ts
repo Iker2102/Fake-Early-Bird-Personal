@@ -133,6 +133,7 @@ whatsappClient.on("disconnected", async (reason) => {
 
 /**
  * Cierra correctamente el cliente de WhatsApp y libera Puppeteer
+ * @returns 
  */
 export async function destroyWhatsAppClient(): Promise<void> {
     if (!whatsappClient) {
@@ -151,6 +152,7 @@ export async function destroyWhatsAppClient(): Promise<void> {
 
 /**
  * Devuelve el estado actual de WhatsApp y el QR activo si existe
+ * @returns 
  */
 export function getWhatsAppStatus() {
     return {
@@ -160,7 +162,8 @@ export function getWhatsAppStatus() {
 }
 
 /**
- * Programa una reconexión automática usando backoff exponencial.
+ * Programa una reconexión automática usando backoff exponencial
+ * @returns 
  */
 function scheduleReconnect(): void {
     if (reconnectAttempts >= env.WA_RECONNECT_MAX_ATTEMPTS) {

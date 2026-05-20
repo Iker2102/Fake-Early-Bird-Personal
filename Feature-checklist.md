@@ -30,9 +30,9 @@
 - [x] Instalar `node-cron`
 - [x] Job principal: cada minuto revisa mensajes en estado `scheduled` cuya `scheduledAt` ya pasó
 - [x] Mutex/lock para evitar procesamiento simultáneo
-- [ ] Respetar horario laboral configurable (`WORK_HOURS_START/END`)
-- [ ] Detectar fin de semana y festivos → reprogramar al siguiente día hábil
-- [ ] Manejo de timezone (configurar con `TZ` en `.env`)
+- [x] Respetar horario laboral configurable (`WORK_HOURS_START/END`)
+- [x] Detectar fin de semana y festivos → reprogramar al siguiente día hábil
+- [x] Manejo de timezone (configurar con `TZ` en `.env`)
 - [x] Prevención de duplicados por ID único antes de encolar
 
 ---
