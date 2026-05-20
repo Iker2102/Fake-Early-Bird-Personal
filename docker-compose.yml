@@ -1,0 +1,13 @@
+services:
+  fake-early-bird:
+    build: .
+    container_name: fake-early-bird
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./.wwebjs_auth:/app/.wwebjs_auth
+      - ./.wwebjs_cache:/app/.wwebjs_cache
+    restart: unless-stopped

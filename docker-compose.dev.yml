@@ -1,0 +1,16 @@
+services:
+  fake-early-bird:
+    build: .
+    container_name: fake-early-bird-dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./.wwebjs_auth:/app/.wwebjs_auth
+      - ./.wwebjs_cache:/app/.wwebjs_cache
+      - ./data:/app/data
+    command: npm run dev
+    restart: unless-stopped

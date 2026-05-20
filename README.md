@@ -68,7 +68,48 @@ WA_SESSION_PATH=./.wwebjs_auth
 ```bash
 npm run dev
 ```
-s
+
+# Desarrollo con Docker
+
+## Ejecutar entorno de desarrollo con hot reload
+
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+La aplicación estará disponible en:
+
+```txt
+http://localhost:3000
+```
+
+---
+
+## Reconstruir contenedor tras instalar nuevas dependencias
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+
+---
+
+## Detener entorno Docker
+
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+---
+
+## Notas
+
+- Los cambios en el código se reflejan automáticamente gracias a los volúmenes Docker.
+- No es necesario reconstruir el contenedor al modificar archivos TypeScript, HTML, CSS o JavaScript.
+- Solo es necesario reconstruir la imagen al instalar nuevas dependencias o modificar el Dockerfile.
+
+
+
+
 ---
 
 
