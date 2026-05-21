@@ -62,7 +62,7 @@ npm run dev
 ## Ejecutar entorno de desarrollo con hot reload
 
 ```bash
-docker compose -f docker-compose.dev.yml up
+docker compose -f docker-compose.dev.yml up -d
 ```
 
 La aplicación estará disponible en:
