@@ -71,6 +71,11 @@ export const env = {
     NOTIFY_ON_DISCONNECT: getBooleanEnv("NOTIFY_ON_DISCONNECT", true),
 
     WA_ENABLED: getBooleanEnv("WA_ENABLED", true),
+    
+    RANDOM_DELAY_MIN_SECONDS: getNumberEnv("RANDOM_DELAY_MIN_SECONDS", 30),
+    RANDOM_DELAY_MAX_SECONDS: getNumberEnv("RANDOM_DELAY_MAX_SECONDS", 180),
+    TYPING_BASE_DELAY_MS: getNumberEnv("TYPING_BASE_DELAY_MS", 1000),
+    TYPING_MS_PER_CHAR: getNumberEnv("TYPING_MS_PER_CHAR", 40),
 };
 
 

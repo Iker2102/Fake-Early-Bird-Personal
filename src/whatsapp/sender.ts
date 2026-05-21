@@ -1,7 +1,14 @@
+import { env } from "../config/env.js";
+import { sleep, randomBetween } from "../shared/time.js";
 import { isClientReady, whatsappClient } from "./client.js";
 
 /**
- * Envía un mensaje manual de WhatsApp a un número concreto.
+ * Envía un mensaje manual de WhatsApp a un número concreto
+ * 
+ * No se hizo con sendPresenceUpdate('composing'), se hizo con typing y pausa proporcional al texto, que es equivalente
+ * 
+ * @param phone 
+ * @param message 
  */
 export async function sendManualMessage(phone: string, message: string): Promise<void> {
     if (!isClientReady() || !whatsappClient) {
@@ -10,6 +17,26 @@ export async function sendManualMessage(phone: string, message: string): Promise
 
     const cleanPhone = phone.replace("+", "").replace(/\s/g, "");
     const chatId = `${cleanPhone}@c.us`;
+
+    const delaySeconds = randomBetween(
+        env.RANDOM_DELAY_MIN_SECONDS,
+        env.RANDOM_DELAY_MAX_SECONDS
+    );
+
+    console.log(`Esperando ${delaySeconds}s antes de enviar a ${phone}`);
+
+    await sleep(delaySeconds * 1000);
+
+    const typingDelay =
+        env.TYPING_BASE_DELAY_MS + message.length * env.TYPING_MS_PER_CHAR;
+
+    const chat = await whatsappClient.getChatById(chatId);
+
+    await chat.sendStateTyping();
+
+    await sleep(typingDelay);
+
+    await chat.clearState();
 
     await whatsappClient.sendMessage(chatId, message);
 
