@@ -2,6 +2,9 @@ import { randomUUID } from "crypto";
 
 import { database } from "../database.js";
 
+import { env } from "../../config/env.js";
+import { randomBetween } from "../../shared/time.js";
+
 /**
  * Estados disponibles en un mensaje programado
  */
@@ -49,7 +52,7 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
         phone: input.phone,
         contactName: input.contactName ?? null,
         message: input.message,
-        scheduledAt: input.scheduledAt,
+        scheduledAt: applyScheduleVariation(input.scheduledAt),
         status: "scheduled",
         createdAt: now,
         sentAt: null,
@@ -202,4 +205,71 @@ export function countPendingMessages(): number {
         .get() as { total: number };
 
     return result.total;
+}
+
+/**
+ * Devuelve el último mensaje enviado a un contacto concreto
+ * @param phone 
+ * @returns 
+ */
+export function findLastSentMessageByPhone(phone: string): ScheduledMessage | null {
+    const result = database
+        .prepare(
+            `
+            SELECT *
+            FROM scheduled_messages
+            WHERE phone = ?
+              AND status = 'sent'
+              AND sentAt IS NOT NULL
+            ORDER BY sentAt DESC
+            LIMIT 1
+            `
+        )
+        .get(phone) as ScheduledMessage | undefined;
+
+    return result ?? null;
+}
+
+/**
+ * Cuenta cuántos mensajes se han enviado hoy a un contacto concreto
+ * @param phone 
+ * @param dayStart 
+ * @param dayEnd 
+ * @returns 
+ */
+export function countMessagesSentTodayByPhone(phone: string, dayStart: string, dayEnd: string): number {
+    const result = database
+        .prepare(
+            `
+            SELECT COUNT(*) as total
+            FROM scheduled_messages
+            WHERE phone = ?
+              AND status = 'sent'
+              AND sentAt >= ?
+              AND sentAt < ?
+            `
+        )
+        .get(phone, dayStart, dayEnd) as { total: number };
+
+    return result.total;
+}
+
+/**
+ * Aplica una variación aleatoria de ±N minutos a la fecha programada
+ * @param scheduledAt 
+ * @returns 
+ */
+function applyScheduleVariation(scheduledAt: string): string {
+    const variationMinutes = env.SCHEDULE_VARIATION_MINUTES;
+
+    if (variationMinutes <= 0) {
+        return scheduledAt;
+    }
+
+    const offsetMinutes = randomBetween(-variationMinutes, variationMinutes);
+
+    const date = new Date(scheduledAt);
+    date.setMinutes(date.getMinutes() + offsetMinutes);
+
+    return date.toISOString();
 }

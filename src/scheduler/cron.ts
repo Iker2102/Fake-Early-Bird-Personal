@@ -13,6 +13,8 @@ import { isClientReady } from "../whatsapp/client.js";
 
 let isProcessingQueue = false;
 
+import { canSendByCooldown, canSendByDailyLimit } from "./rules.js";
+
 /**
  * Procesa la cola de mensajes pendientes
  * @returns 
@@ -49,6 +51,17 @@ async function processScheduledMessages(): Promise<void> {
         const messages = findDueScheduledMessages(now);
 
         for (const message of messages) {
+
+            if (!canSendByCooldown(message)) {
+                console.log(`Mensaje ${message.id} pausado por cooldown`);
+                continue;
+            }
+
+            if (!canSendByDailyLimit(message)) {
+                console.log(`Mensaje ${message.id} pausado por límite diario`);
+                continue;
+            }
+
             try {
                 markMessageAsSending(message.id);
 

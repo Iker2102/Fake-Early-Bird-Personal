@@ -41,9 +41,9 @@
 
 - [x] Delay aleatorio pre-envío (`RANDOM_DELAY_MIN/MAX_SECONDS`)
 - [x] Simular escritura (`sendPresenceUpdate('composing')` + pausa proporcional al texto)
-- [ ] Variación horaria ±N minutos (configurable)
-- [ ] Cooldown entre mensajes consecutivos al mismo contacto
-- [ ] Límite anti-spam: máx. mensajes por contacto por día
+- [x] Variación horaria ±N minutos (configurable)
+- [x] Cooldown entre mensajes consecutivos al mismo contacto
+- [x] Límite anti-spam: máx. mensajes por contacto por día
 
 ---
 
