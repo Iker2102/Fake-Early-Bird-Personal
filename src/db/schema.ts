@@ -1,7 +1,7 @@
 import { database } from "./database.js";
 
 /**
- * Crea las tablas principales de la aplicación
+ * Crea las tablas principales de la aplicación.
  */
 export function initializeDatabase(): void {
     database.exec(`
@@ -27,7 +27,9 @@ export function initializeDatabase(): void {
 
             notifiedAt TEXT,
 
-            failReason TEXT
+            failReason TEXT,
+
+            whatsappMessageId TEXT
         );
 
         CREATE TABLE IF NOT EXISTS contacts (
@@ -47,23 +49,6 @@ export function initializeDatabase(): void {
         CREATE TABLE IF NOT EXISTS email_logs (
             id TEXT PRIMARY KEY,
 
-            messageId TEXT,
-
-            type TEXT NOT NULL,
-
-            sentAt TEXT NOT NULL,
-
-            success INTEGER NOT NULL,
-
-            error TEXT,
-
-            FOREIGN KEY (messageId)
-                REFERENCES scheduled_messages(id)
-        );
-
-        CREATE TABLE IF NOT EXISTS email_logs (
-            id TEXT PRIMARY KEY,
-
             recipient TEXT NOT NULL,
 
             subject TEXT NOT NULL,
@@ -71,10 +56,19 @@ export function initializeDatabase(): void {
             status TEXT NOT NULL,
 
             errorMessage TEXT,
-            
+
             createdAt TEXT NOT NULL
         );
     `);
+
+    try {
+        database.exec(`
+            ALTER TABLE scheduled_messages
+            ADD COLUMN whatsappMessageId TEXT;
+        `);
+    } catch (error) {
+        console.warn("No se pudo añadir whatsappMessageId:", error);
+    }
 
     console.log("Database schema initialized");
 }

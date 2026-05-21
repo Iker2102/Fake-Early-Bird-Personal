@@ -65,9 +65,10 @@ async function processScheduledMessages(): Promise<void> {
             try {
                 markMessageAsSending(message.id);
 
-                await sendManualMessage(message.phone, message.message);
+                const whatsappMessageId = await sendManualMessage(message.phone, message.message);
 
-                markMessageAsSent(message.id);
+                markMessageAsSent(message.id, whatsappMessageId);
+                
             } catch (error) {
                 const reason = error instanceof Error ? error.message : "Error desconocido";
 

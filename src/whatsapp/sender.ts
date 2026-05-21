@@ -10,7 +10,7 @@ import { isClientReady, whatsappClient } from "./client.js";
  * @param phone 
  * @param message 
  */
-export async function sendManualMessage(phone: string, message: string): Promise<void> {
+export async function sendManualMessage(phone: string, message: string): Promise<string> {
     if (!isClientReady() || !whatsappClient) {
         throw new Error("WHATSAPP_NOT_READY");
     }
@@ -40,5 +40,9 @@ export async function sendManualMessage(phone: string, message: string): Promise
 
     await whatsappClient.sendMessage(chatId, message);
 
+    const sentMessage = await whatsappClient.sendMessage(chatId, message);
+
     console.log(`Mensaje enviado a ${phone}`);
+
+    return sentMessage.id._serialized;
 }

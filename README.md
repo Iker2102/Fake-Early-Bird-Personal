@@ -51,21 +51,7 @@ npm install
 
 ---
 
-## 4. Configurar variables de entorno
-
-Crear archivo `.env`:
-
-```env
-PORT=3000
-DB_PATH=./data/app.db
-WA_SESSION_PATH=./.wwebjs_auth
-WA_RECONNECT_MAX_ATTEMPTS=5
-WA_RECONNECT_BASE_DELAY_SECONDS=5
-```
-
----
-
-## 5. Ejecutar en desarrollo
+## 4. Ejecutar en desarrollo
 
 ```bash
 npm run dev
@@ -217,4 +203,24 @@ GET /api/messages
 - [x] Horario laboral configurable
 - [-] Fines de semana y festivos
 - [x] Timezone
+- [x] Cooldown entre mensajes consecutivos al mismo contacto
+- [x] Límite anti-spam por contacto al día
+- [x] Variación horaria configurable
 - [ ] Prevención avanzada de duplicados
+
+## Fase 4 - Humanización
+- [x] Delay aleatorio pre-envío
+- [x] Simulación de escritura
+- [x] Variación horaria ±N minutos
+- [x] Cooldown entre mensajes consecutivos
+- [x] Límite anti-spam configurable
+
+## Fase 5 - Sistema de Verificación de Entrega
+- [x] Suscripción al evento `message_ack`
+- [-] Mapeo de niveles ACK
+- [x] Registro de `whatsappMessageId` en BD
+- [-] Actualización automática a `delivered` mediante ACK >= 2
+- [ ] Timeout configurable de entrega
+- [ ] Emails de confirmación de entrega
+- [ ] Detección de timeout de entrega
+- [ ] Retry automático ante fallo de ACK

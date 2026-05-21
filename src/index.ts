@@ -30,7 +30,7 @@ await verifyEmailTransport();
  */
 
 if (env.WA_ENABLED) {
-    await initializeWhatsAppClient();
+    void initializeWhatsAppClient();
 } else {
     console.log("WhatsApp desactivado por configuración");
 }

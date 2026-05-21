@@ -157,17 +157,37 @@ export function markMessageAsSending(id: string): void {
  * Marca un mensaje como enviado correctamente
  * @param id 
  */
-export function markMessageAsSent(id: string): void {
+export function markMessageAsSent(id: string, whatsappMessageId: string): void {
     database
         .prepare(
             `
             UPDATE scheduled_messages
             SET status = 'sent',
-                sentAt = ?
+                sentAt = ?,
+                whatsappMessageId = ?
             WHERE id = ?
             `
         )
-        .run(new Date().toISOString(), id);
+        .run(new Date().toISOString(), whatsappMessageId, id);
+}
+
+/**
+ * Marca un mensaje como enviado
+ * @param whatsappMessageId 
+ * @param ackLevel 
+ */
+export function markMessageAsDelivered(whatsappMessageId: string, ackLevel: number): void {
+    database
+        .prepare(
+            `
+            UPDATE scheduled_messages
+            SET status = 'delivered',
+                deliveredAt = ?,
+                ackLevel = ?
+            WHERE whatsappMessageId = ?
+            `
+        )
+        .run(new Date().toISOString(), ackLevel, whatsappMessageId);
 }
 
 /**

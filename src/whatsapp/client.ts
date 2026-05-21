@@ -11,6 +11,9 @@ import { countPendingMessages } from "../db/repositories/scheduledMessageReposit
 
 const { Client, LocalAuth } = pkg;
 
+import { registerAckWatcher } from "./ackWatcher.js";
+
+
 
 
 let isWhatsAppReady = false;
@@ -67,6 +70,8 @@ export async function initializeWhatsAppClient(): Promise<void> {
         ],
     },
 });
+
+registerAckWatcher(whatsappClient);
 
 /**
  * Evento lanzado cuando WhatsApp genera un nuevo QR
@@ -147,11 +152,16 @@ whatsappClient.on("disconnected", async (reason) => {
     try {
         await whatsappClient.initialize();
     } catch (error) {
+
+        whatsappStatus = "error";
+        isWhatsAppReady = false;
+
         console.error("Error inicializando WhatsApp:", error);
 
         await destroyWhatsAppClient();
 
-        throw error;
+        scheduleReconnect();
+
     } finally {
         isInitializing = false;
     }

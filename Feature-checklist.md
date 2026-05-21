@@ -49,12 +49,12 @@
 
 ## Fase 5 - Sistema de Verificación de Entrega ⭐ NUEVO
 
-- [ ] Suscribirse al evento `message_ack` de whatsapp-web.js
-- [ ] Mapear niveles ACK: `0=pending, 1=server, 2=device, 3=read, 4=played`
-- [ ] Al enviar, registrar `messageId` de WhatsApp en BD para correlacionar el ACK
+- [x] Suscribirse al evento `message_ack` de whatsapp-web.js
+- [-] Mapear niveles ACK: `0=pending, 1=server, 2=device, 3=read, 4=played`
+- [x] Al enviar, registrar `messageId` de WhatsApp en BD para correlacionar el ACK
 - [ ] Iniciar temporizador de `DELIVERY_TIMEOUT_MINUTES` tras el envío
-- [ ] Si llega `ACK_DEVICE (2)` o superior dentro del timeout:
-  - [ ] Actualizar BD: `status=delivered`, `deliveredAt`, `ackLevel`
+- [-] Si llega `ACK_DEVICE (2)` o superior dentro del timeout:
+  - [x] Actualizar BD: `status=delivered`, `deliveredAt`, `ackLevel`
   - [ ] Enviar email de confirmación si `NOTIFY_ON_SUCCESS=true`
 - [ ] Si expira el timeout sin `ACK_DEVICE`:
   - [ ] Actualizar BD: `status=delivery_failed`, `failReason=timeout`
