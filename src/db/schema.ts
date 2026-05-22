@@ -1,5 +1,31 @@
 import { database } from "./database.js";
 
+interface TableColumn {
+    cid: number;
+    name: string;
+    type: string;
+    notnull: number;
+    dflt_value: string | number | null;
+    pk: number;
+}
+
+/**
+ * Añade una columna a una tabla si todavía no existe.
+ */
+function addColumnIfNotExists(tableName: string, columnName: string, definition: string): void {
+    const tableInfo = database.prepare(`PRAGMA table_info(${tableName})`).all() as TableColumn[];
+
+    const columnExists = tableInfo.some((column) => column.name === columnName);
+
+    if (columnExists) {
+        return;
+    }
+
+    database.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+
+    console.log(`Columna ${columnName} añadida correctamente a ${tableName}`);
+}
+
 /**
  * Crea las tablas principales de la aplicación.
  */
@@ -61,14 +87,7 @@ export function initializeDatabase(): void {
         );
     `);
 
-    try {
-        database.exec(`
-            ALTER TABLE scheduled_messages
-            ADD COLUMN whatsappMessageId TEXT;
-        `);
-    } catch (error) {
-        console.warn("No se pudo añadir whatsappMessageId:", error);
-    }
+    addColumnIfNotExists("scheduled_messages", "whatsappMessageId", "TEXT");
 
     console.log("Database schema initialized");
 }
