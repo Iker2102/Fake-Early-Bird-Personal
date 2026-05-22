@@ -13,9 +13,11 @@ services:
       - ./data:/app/data
       - wwebjs_auth_dev:/app/.wwebjs_auth
       - wwebjs_cache_dev:/app/.wwebjs_cache
+    tmpfs:
+      - /tmp
     command: npm run dev:docker
-    restart: unless-stopped
-    stop_grace_period: 15s
+    restart: "no"
+    stop_grace_period: 60s
 
 volumes:
   wwebjs_auth_dev:

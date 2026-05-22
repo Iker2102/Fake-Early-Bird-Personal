@@ -14,6 +14,7 @@ const { Client, LocalAuth } = pkg;
 import { registerAckWatcher } from "./ackWatcher.js";
 
 import { cleanupWhatsAppSessionLocks } from "./sessionCleanup.js";
+import { resolve } from "node:dns";
 
 
 
@@ -70,6 +71,10 @@ export async function initializeWhatsAppClient(): Promise<void> {
                 "--no-sandbox",
                 "--disable-setuid-sandbox",
                 "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--no-first-run",
+                "--no-zygote",
+                "--disable-extensions",
         ],
     },
 });
@@ -231,7 +236,10 @@ export async function destroyWhatsAppClient(): Promise<void> {
     }
 
     try {
-        await whatsappClient.destroy();
+        await Promise.race([
+            whatsappClient.destroy(),
+            new Promise((resolve) => setTimeout(resolve, 10000))
+        ]);
     } catch (error) {
         console.error("Error cerrando cliente de WhatsApp:", error);
     } finally {
