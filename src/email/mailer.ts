@@ -36,7 +36,11 @@ interface EmailJob {
 }
 
 const MAX_ATTEMPTS = 3;
-const RETRY_DELAY_MS = 5_000;
+const RETRY_DELAY_MS = [
+    1 * 60 * 1000,
+    5 * 60 * 1000,
+    15 * 60 * 1000
+];
 const POLL_INTERVAL_MS = 1_000;
 
 class EmailQueue {
@@ -115,13 +119,14 @@ class EmailQueue {
             console.error(`[EmailQueue] Fallo al enviar id=${job.id}: ${message}`);
 
             if (job.attempts < MAX_ATTEMPTS) {
+                const delay = RETRY_DELAY_MS[job.attempts - 1] ?? RETRY_DELAY_MS.at(-1)!;
                 console.log(
-                    `[EmailQueue] Reintento ${job.attempts + 1}/${MAX_ATTEMPTS} en ${RETRY_DELAY_MS / 1000}s`
+                    `[EmailQueue] Reintento ${job.attempts + 1}/${MAX_ATTEMPTS} en ${delay / 1000}s`
                 );
                 setTimeout(() => {
                     this.queue.unshift(job);
                     if (!this.isRunning) this.startWorker();
-                }, RETRY_DELAY_MS);
+                }, delay);
             } else {
                 createEmailLog(job.to, job.subject, "failed", message);
                 console.error(`[EmailQueue] Job id=${job.id} descartado tras ${MAX_ATTEMPTS} intentos`);
