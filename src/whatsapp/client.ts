@@ -13,6 +13,8 @@ const { Client, LocalAuth } = pkg;
 
 import { registerAckWatcher } from "./ackWatcher.js";
 
+import { cleanupWhatsAppSessionLocks } from "./sessionCleanup.js";
+
 
 
 let isWhatsAppReady = false;
@@ -54,6 +56,8 @@ export async function initializeWhatsAppClient(): Promise<void> {
     }
 
     isInitializing = true;
+
+    cleanupWhatsAppSessionLocks();
 
     whatsappClient = new Client({
         authStrategy: new LocalAuth({
@@ -148,25 +152,36 @@ whatsappClient.on("disconnected", async (reason) => {
     scheduleReconnect();   
 });
 
-    try {
-        await whatsappClient.initialize();
+try {
+    await whatsappClient.initialize();
     } catch (error) {
 
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+            error instanceof Error ? error.message : String(error);
 
         whatsappStatus = "error";
         isWhatsAppReady = false;
 
         console.error("Error inicializando WhatsApp:", error);
 
-        await destroyWhatsAppClient();
-
+        /**
+         * Error de permisos en Linux/macOS, porque si hago chown, el sería inseguro y no funcionaría en todos los entornos
+         */
         if (errorMessage.includes("EACCES")) {
-            whatsappStatus = "error";
-            console.error("Error de permisos en la sesión de WhatsApp. Revisa .wwebjs_auth.");
+            whatsappClient = null;
+            isInitializing = false;
+
+            console.error(
+                "Error de permisos en la sesión de WhatsApp. Revisa .wwebjs_auth."
+            );
+
             return;
         }
 
+        /**
+         * Para otros errores sí intentamos reconectar
+         */
+        await destroyWhatsAppClient();
 
         scheduleReconnect();
 
