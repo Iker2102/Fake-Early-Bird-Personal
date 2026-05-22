@@ -76,21 +76,21 @@
 
 ### Templates HTML a implementar
 
-- [ ] `delivery_failure.html` — alerta roja: mensaje fallido, contacto, motivo, sugerencia
-- [ ] `delivery_success.html` — confirmación verde: contacto, extracto, timestamp ACK
-- [ ] `whatsapp_disconnected.html` — aviso naranja: sesión perdida, N mensajes en cola
-- [ ] `retry_exhausted.html` — alerta crítica: reintentos agotados, acción manual requerida
-- [ ] `daily_summary.html` — resumen diario: enviados, entregados, fallidos, tasa de éxito
+- [x] `delivery_failure.html` — alerta roja: mensaje fallido, contacto, motivo, sugerencia
+- [x] `delivery_success.html` — confirmación verde: contacto, extracto, timestamp ACK
+- [x] `whatsapp_disconnected.html` — aviso naranja: sesión perdida, N mensajes en cola
+- [x] `retry_exhausted.html` — alerta crítica: reintentos agotados, acción manual requerida
+- [x] `daily_summary.html` — resumen diario: enviados, entregados, fallidos, tasa de éxito
 
 ---
 
 ## Fase 7 - Base de Datos
 
-- [ ] Tabla `scheduled_messages` con todos los campos del schema v2
-- [ ] Tabla `contacts` (id, name, phone, tags, priority, lastInteraction)
-- [ ] Tabla `email_logs` (id, messageId, type, sentAt, success, error)
-- [ ] Repositories: CRUD para cada entidad
-- [ ] Migraciones versionadas (archivo `migrations/`)
+- [-] Tabla `scheduled_messages` con todos los campos del schema v2
+- [x] Tabla `contacts` (id, name, phone, tags, priority, lastInteraction)
+- [-] Tabla `email_logs` (id, messageId, type, sentAt, success, error)
+- [-] Repositories: CRUD para cada entidad
+- [-] Migraciones versionadas (archivo `migrations/`)
 - [ ] Backup automático diario (copiar `.db` → `.db.bak` con timestamp)
 
 ---

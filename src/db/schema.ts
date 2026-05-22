@@ -12,18 +12,30 @@ interface TableColumn {
 /**
  * Añade una columna a una tabla si todavía no existe.
  */
-function addColumnIfNotExists(tableName: string, columnName: string, definition: string): void {
-    const tableInfo = database.prepare(`PRAGMA table_info(${tableName})`).all() as TableColumn[];
+function addColumnIfNotExists(
+    tableName: string,
+    columnName: string,
+    definition: string
+): void {
+    const tableInfo = database
+        .prepare(`PRAGMA table_info(${tableName})`)
+        .all() as TableColumn[];
 
-    const columnExists = tableInfo.some((column) => column.name === columnName);
+    const columnExists = tableInfo.some(
+        (column) => column.name === columnName
+    );
 
     if (columnExists) {
         return;
     }
 
-    database.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+    database.exec(
+        `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`
+    );
 
-    console.log(`Columna ${columnName} añadida correctamente a ${tableName}`);
+    console.log(
+        `Columna ${columnName} añadida correctamente a ${tableName}`
+    );
 }
 
 /**
@@ -75,19 +87,38 @@ export function initializeDatabase(): void {
         CREATE TABLE IF NOT EXISTS email_logs (
             id TEXT PRIMARY KEY,
 
-            recipient TEXT NOT NULL,
+            messageId TEXT,
 
+            recipient TEXT NOT NULL,
             subject TEXT NOT NULL,
 
+            type TEXT,
             status TEXT NOT NULL,
 
+            sentAt TEXT,
+            success INTEGER,
+
+            error TEXT,
             errorMessage TEXT,
 
-            createdAt TEXT NOT NULL
+            createdAt TEXT NOT NULL,
+
+            FOREIGN KEY (messageId)
+                REFERENCES scheduled_messages(id)
         );
     `);
 
-    addColumnIfNotExists("scheduled_messages", "whatsappMessageId", "TEXT");
+    addColumnIfNotExists(
+        "scheduled_messages",
+        "whatsappMessageId",
+        "TEXT"
+    );
+
+    addColumnIfNotExists("email_logs", "messageId", "TEXT");
+    addColumnIfNotExists("email_logs", "type", "TEXT");
+    addColumnIfNotExists("email_logs", "sentAt", "TEXT");
+    addColumnIfNotExists("email_logs", "success", "INTEGER");
+    addColumnIfNotExists("email_logs", "error", "TEXT");
 
     console.log("Database schema initialized");
 }
