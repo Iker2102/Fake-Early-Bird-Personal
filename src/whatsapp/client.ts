@@ -129,7 +129,7 @@ whatsappClient.on("auth_failure", async (message) => {
     const pendingMessages = countPendingMessages();
 
     if (pendingMessages > 0) {
-        await sendDisconnectAlertEmail(`auth_failure: ${message}`, pendingMessages);
+        sendDisconnectAlertEmail(`auth_failure: ${message}`, pendingMessages);
     }
 
     console.error("Error de autenticación:", message);
@@ -149,7 +149,7 @@ whatsappClient.on("disconnected", async (reason) => {
     const pendingMessages = countPendingMessages();
 
     if (pendingMessages > 0) {
-        await sendDisconnectAlertEmail(reason, pendingMessages);
+        sendDisconnectAlertEmail(reason, pendingMessages);
     }
 
     console.warn("WhatsApp desconectado:", reason);
