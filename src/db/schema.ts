@@ -67,7 +67,13 @@ export function initializeDatabase(): void {
 
             failReason TEXT,
 
-            whatsappMessageId TEXT
+            whatsappMessageId TEXT,
+
+            lastRestryAt TEXT,
+
+            deliveryTimeoutAt TEXT,
+
+            updatedAt TEXT
         );
 
         CREATE TABLE IF NOT EXISTS contacts (
@@ -119,6 +125,13 @@ export function initializeDatabase(): void {
     addColumnIfNotExists("email_logs", "sentAt", "TEXT");
     addColumnIfNotExists("email_logs", "success", "INTEGER");
     addColumnIfNotExists("email_logs", "error", "TEXT");
+
+
+    addColumnIfNotExists("scheduled_messages", "lastRestryAt", "TEXT");
+    addColumnIfNotExists("scheduled_messages", "deliveryTimeoutAt", "TEXT");
+    addColumnIfNotExists("scheduled_messages", "updatedAt", "TEXT");
+
+
 
     console.log("Database schema initialized");
 }

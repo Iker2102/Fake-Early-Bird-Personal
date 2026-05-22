@@ -38,8 +38,6 @@ export async function sendManualMessage(phone: string, message: string): Promise
 
     await chat.clearState();
 
-    await whatsappClient.sendMessage(chatId, message);
-
     const sentMessage = await whatsappClient.sendMessage(chatId, message);
 
     console.log(`Mensaje enviado a ${phone}`);

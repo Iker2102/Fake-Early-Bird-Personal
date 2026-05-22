@@ -20,7 +20,7 @@
 - [x] Generar y mostrar QR en consola y dashboard
 - [x] Detectar estado: `qr`, `ready`, `authenticated`, `disconnected`
 - [x] Implementar reconexión automática con backoff exponencial
-- [x] Disparar email de alerta si se detecta `auth_failure` o `disconnected` con mensajes en cola
+- [-] Disparar email de alerta si se detecta `auth_failure` o `disconnected` con mensajes en cola
 - [x] Probar envío manual simple a número de prueba
 
 ---
@@ -86,12 +86,12 @@
 
 ## Fase 7 - Base de Datos
 
-- [-] Tabla `scheduled_messages` con todos los campos del schema v2
+- [x] Tabla `scheduled_messages` con todos los campos del schema v2
 - [x] Tabla `contacts` (id, name, phone, tags, priority, lastInteraction)
-- [-] Tabla `email_logs` (id, messageId, type, sentAt, success, error)
-- [-] Repositories: CRUD para cada entidad
-- [-] Migraciones versionadas (archivo `migrations/`)
-- [ ] Backup automático diario (copiar `.db` → `.db.bak` con timestamp)
+- [x] Tabla `email_logs` (id, messageId, type, sentAt, success, error)
+- [x] Repositories: CRUD para cada entidad
+- [x] Migraciones versionadas (archivo `migrations/`)
+- [x] Backup automático diario (copiar `.db` → `.db.bak` con timestamp)
 
 ---
 

@@ -11,6 +11,8 @@ import { verifyEmailTransport } from "./email/mailer.js";
 
 import { startScheduler } from "./scheduler/cron.js";
 
+import { startBackupScheduler } from "./scheduler/backupCron.js";
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,6 +41,11 @@ if (env.WA_ENABLED) {
  * Inicializa el scheduler
  */
 startScheduler();
+
+/**
+ * Inicia el scheduler del backup
+ */
+startBackupScheduler();
 
 /**
  * Permite recibir peticiones JSON en la API

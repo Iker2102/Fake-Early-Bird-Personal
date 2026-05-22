@@ -4,10 +4,19 @@ import { findMessageByWhatsappId, markMessageAsAckFailed, markMessageAsDelivered
 import { ACK_LEVELS, getAckLabel } from "./ackLevels.js";
 import { clearDeliveryTimeout } from "./deliveryTimeout.js";
 
+let isAckWatcherRegistered = false;
+
 /**
  * Registra el listener de ACK para actualizar mensajes entregados.
  */
 export function registerAckWatcher(client: any): void {
+
+    if(isAckWatcherRegistered) {
+        return;
+    }
+
+    isAckWatcherRegistered = true;
+
     client.on("message_ack", (message: any, ack: number) => {
         const whatsappMessageId = message.id?._serialized;
 
@@ -41,4 +50,11 @@ export function registerAckWatcher(client: any): void {
             return;
         }
     });
+}
+
+/**
+ * Resetea el registro del ack watcher
+ */
+export function resetAckWatcher(): void {
+    isAckWatcherRegistered = false;
 }

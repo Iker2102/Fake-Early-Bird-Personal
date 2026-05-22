@@ -11,9 +11,10 @@ import { countPendingMessages } from "../db/repositories/scheduledMessageReposit
 
 const { Client, LocalAuth } = pkg;
 
-import { registerAckWatcher } from "./ackWatcher.js";
+import { registerAckWatcher, resetAckWatcher } from "./ackWatcher.js";
 
 import { cleanupWhatsAppSessionLocks } from "./sessionCleanup.js";
+
 import { resolve } from "node:dns";
 
 
@@ -192,6 +193,7 @@ try {
 
     } finally {
         isInitializing = false;
+        resetAckWatcher();
     }
 }
 
