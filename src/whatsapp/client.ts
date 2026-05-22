@@ -15,9 +15,6 @@ import { registerAckWatcher, resetAckWatcher } from "./ackWatcher.js";
 
 import { cleanupWhatsAppSessionLocks } from "./sessionCleanup.js";
 
-import { resolve } from "node:dns";
-
-
 
 let isWhatsAppReady = false;
 
@@ -111,6 +108,10 @@ whatsappClient.on("authenticated", () => {
  * Evento lanzado cuando el cliente esta completamente listo
  */
 whatsappClient.on("ready", () => {
+    if(isWhatsAppReady) {
+        return;
+    }
+    
     whatsappStatus = "ready";
     currentQr = null;
     reconnectAttempts = 0;
@@ -147,7 +148,7 @@ whatsappClient.on("disconnected", async (reason) => {
     isWhatsAppReady = false;
 
     const pendingMessages = countPendingMessages();
-    sendDisconnectAlertEmail(reason, pendingMessages);
+
     if (pendingMessages > 0) {
         sendDisconnectAlertEmail(reason, pendingMessages);
     }
@@ -193,7 +194,6 @@ try {
 
     } finally {
         isInitializing = false;
-        resetAckWatcher();
     }
 }
 
@@ -248,6 +248,7 @@ export async function destroyWhatsAppClient(): Promise<void> {
         whatsappClient = null;
         isInitializing = false;
         isWhatsAppReady = false;
+        resetAckWatcher();
     }
 }
 

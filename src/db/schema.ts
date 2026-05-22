@@ -121,10 +121,14 @@ export function initializeDatabase(): void {
     );
 
     addColumnIfNotExists("email_logs", "messageId", "TEXT");
+    addColumnIfNotExists("email_logs", "recipient", "TEXT");
+    addColumnIfNotExists("email_logs", "subject", "TEXT");
     addColumnIfNotExists("email_logs", "type", "TEXT");
+    addColumnIfNotExists("email_logs", "status", "TEXT");
     addColumnIfNotExists("email_logs", "sentAt", "TEXT");
     addColumnIfNotExists("email_logs", "success", "INTEGER");
     addColumnIfNotExists("email_logs", "error", "TEXT");
+    addColumnIfNotExists("email_logs", "errorMessage", "TEXT");
     addColumnIfNotExists("email_logs", "createdAt", "TEXT");
 
     addColumnIfNotExists("scheduled_messages", "lastRestryAt", "TEXT");
