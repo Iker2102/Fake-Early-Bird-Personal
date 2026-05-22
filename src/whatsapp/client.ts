@@ -147,7 +147,7 @@ whatsappClient.on("disconnected", async (reason) => {
     isWhatsAppReady = false;
 
     const pendingMessages = countPendingMessages();
-
+    sendDisconnectAlertEmail(reason, pendingMessages);
     if (pendingMessages > 0) {
         sendDisconnectAlertEmail(reason, pendingMessages);
     }
