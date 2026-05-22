@@ -15,7 +15,6 @@ import { registerAckWatcher } from "./ackWatcher.js";
 
 
 
-
 let isWhatsAppReady = false;
 
 /**
@@ -153,12 +152,21 @@ whatsappClient.on("disconnected", async (reason) => {
         await whatsappClient.initialize();
     } catch (error) {
 
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
         whatsappStatus = "error";
         isWhatsAppReady = false;
 
         console.error("Error inicializando WhatsApp:", error);
 
         await destroyWhatsAppClient();
+
+        if (errorMessage.includes("EACCES")) {
+            whatsappStatus = "error";
+            console.error("Error de permisos en la sesión de WhatsApp. Revisa .wwebjs_auth.");
+            return;
+        }
+
 
         scheduleReconnect();
 

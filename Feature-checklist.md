@@ -52,16 +52,16 @@
 - [x] Suscribirse al evento `message_ack` de whatsapp-web.js
 - [x] Mapear niveles ACK: `0=pending, 1=server, 2=device, 3=read, 4=played`
 - [x] Al enviar, registrar `messageId` de WhatsApp en BD para correlacionar el ACK
-- [ ] Iniciar temporizador de `DELIVERY_TIMEOUT_MINUTES` tras el envío
+- [x] Iniciar temporizador de `DELIVERY_TIMEOUT_MINUTES` tras el envío
 - [-] Si llega `ACK_DEVICE (2)` o superior dentro del timeout:
   - [x] Actualizar BD: `status=delivered`, `deliveredAt`, `ackLevel`
   - [ ] Enviar email de confirmación si `NOTIFY_ON_SUCCESS=true`
-- [ ] Si expira el timeout sin `ACK_DEVICE`:
-  - [ ] Actualizar BD: `status=delivery_failed`, `failReason=timeout`
+- [x] Si expira el timeout sin `ACK_DEVICE`:
+  - [x] Actualizar BD: `status=delivery_failed`, `failReason=timeout`
   - [ ] Disparar email de alerta inmediatamente
-- [ ] Si `message_ack` devuelve error explícito:
-  - [ ] Actualizar BD: `status=failed`, `failReason=<error>`
-  - [ ] Disparar retry si `retryCount < RETRY_MAX`, si no → email de alerta
+- [-] Si `message_ack` devuelve error explícito:
+  - [x] Actualizar BD: `status=failed`, `failReason=<error>`
+  - [-] Disparar retry si `retryCount < RETRY_MAX`, si no → email de alerta
 
 ---
 

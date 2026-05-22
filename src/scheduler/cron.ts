@@ -15,6 +15,8 @@ let isProcessingQueue = false;
 
 import { canSendByCooldown, canSendByDailyLimit } from "./rules.js";
 
+import { startDeliveryTimeout } from "../whatsapp/deliveryTimeout.js";
+
 /**
  * Procesa la cola de mensajes pendientes
  * @returns 
@@ -68,7 +70,9 @@ async function processScheduledMessages(): Promise<void> {
                 const whatsappMessageId = await sendManualMessage(message.phone, message.message);
 
                 markMessageAsSent(message.id, whatsappMessageId);
-                
+
+                startDeliveryTimeout(whatsappMessageId);
+
             } catch (error) {
                 const reason = error instanceof Error ? error.message : "Error desconocido";
 

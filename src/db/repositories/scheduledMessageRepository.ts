@@ -8,8 +8,7 @@ import { randomBetween } from "../../shared/time.js";
 /**
  * Estados disponibles en un mensaje programado
  */
-export type ScheduledMessageStatus = "scheduled" | "sending" | "sent" | "failed";
-
+export type ScheduledMessageStatus = | "scheduled" | "sending" | "sent" | "delivered" | "delivery_failed" | "failed";
 /**
  * Representa el mensaje programado alamcenado en la base de datos
  */
@@ -292,4 +291,78 @@ function applyScheduleVariation(scheduledAt: string): string {
     date.setMinutes(date.getMinutes() + offsetMinutes);
 
     return date.toISOString();
+}
+
+/**
+ * Marca un mensaje como fallido por timeout de entrega
+ * @param whatsappMessageId 
+ */
+export function markMessageAsDeliveryFailed(whatsappMessageId: string): void {
+    database
+        .prepare(
+            `
+            UPDATE scheduled_messages
+            SET status = 'delivery_failed',
+                failReason = 'timeout'
+            WHERE whatsappMessageId = ?
+              AND status = 'sent'
+            `
+        )
+        .run(whatsappMessageId);
+}
+
+/**
+ * Marca un mensaje como fallido por error explícito de ACK
+ * @param whatsappMessageId 
+ * @param reason 
+ */
+export function markMessageAsAckFailed(whatsappMessageId: string, reason: string): void {
+    database
+        .prepare(
+            `
+            UPDATE scheduled_messages
+            SET status = 'failed',
+                failReason = ?,
+                retryCount = retryCount + 1
+            WHERE whatsappMessageId = ?
+            `
+        )
+        .run(reason, whatsappMessageId);
+}
+
+/**
+ * Reencola un mensaje fallido para volver a intentarlo
+ * @param whatsappMessageId 
+ */
+export function requeueMessageByWhatsappId(whatsappMessageId: string): void {
+    database
+        .prepare(
+            `
+            UPDATE scheduled_messages
+            SET status = 'scheduled',
+                failReason = NULL
+            WHERE whatsappMessageId = ?
+            `
+        )
+        .run(whatsappMessageId);
+}
+
+/**
+ * Busca un mensaje por su ID real de WhatsApp
+ * @param whatsappMessageId 
+ * @returns 
+ */
+export function findMessageByWhatsappId(whatsappMessageId: string): ScheduledMessage | null {
+    const result = database
+        .prepare(
+            `
+            SELECT *
+            FROM scheduled_messages
+            WHERE whatsappMessageId = ?
+            LIMIT 1
+            `
+        )
+        .get(whatsappMessageId) as ScheduledMessage | undefined;
+
+    return result ?? null;
 }
