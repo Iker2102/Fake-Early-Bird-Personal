@@ -366,3 +366,16 @@ export function findMessageByWhatsappId(whatsappMessageId: string): ScheduledMes
 
     return result ?? null;
 }
+
+/**
+ * Elimina un mensaje programado
+ * @param id 
+ */
+export function deleteScheduledMessage(id: string): void {
+    database.prepare(
+        `
+        DELETE FROM scheduled_messages
+        WHERE id = ?
+        `
+    ).run(id);
+}

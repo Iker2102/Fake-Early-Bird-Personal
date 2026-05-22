@@ -4,6 +4,12 @@ import { getWhatsAppStatus } from "../whatsapp/client.js";
 import { sendManualMessage } from "../whatsapp/sender.js";
 import { createScheduledMessage, findScheduledMessages, } from "../db/repositories/scheduledMessageRepository.js";
 
+import { findContacts } from "../db/repositories/contactRepository.js"
+import { findEmailLogs } from "../db/repositories/emailLogRepository.js"
+
+import { deleteScheduledMessage } from "../db/repositories/scheduledMessageRepository.js";
+
+
 export const apiRouter = Router();
 
 /**
@@ -75,4 +81,33 @@ apiRouter.post("/messages", (req, res) => {
  */
 apiRouter.get("/messages", (_req, res) => {
     res.json(findScheduledMessages());
+});
+
+/**
+ * Lista los contactos
+ */
+apiRouter.get("/contacts", (_req, res) => {
+    res.json(findContacts());
+});
+
+
+/**
+ * Lista los logs
+ */
+apiRouter.get("/logs", (_req, res) => {
+    res.json(findEmailLogs());
+});
+
+
+
+/**
+ * Elimina a partir de una id
+ */
+apiRouter.delete("/messages/:id", (req, res) => {
+    deleteScheduledMessage(req.params.id);
+
+
+    res.json({
+        status: "deleted",
+    });
 });

@@ -13,6 +13,8 @@ import { startScheduler } from "./scheduler/cron.js";
 
 import { startBackupScheduler } from "./scheduler/backupCron.js";
 
+import { localOnly } from "./api/localOnly.js";
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -56,6 +58,12 @@ app.use(express.json());
  * Registra las rutas principales de la API
  */
 app.use("/api", apiRouter);
+
+
+/**
+ * Registra que solo se use desde local
+ */
+app.use(localOnly);
 
 /**
  * Sirve los archivos estáticos del dashboard local

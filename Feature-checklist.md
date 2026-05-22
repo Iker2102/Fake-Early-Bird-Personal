@@ -20,7 +20,7 @@
 - [x] Generar y mostrar QR en consola y dashboard
 - [x] Detectar estado: `qr`, `ready`, `authenticated`, `disconnected`
 - [x] Implementar reconexión automática con backoff exponencial
-- [-] Disparar email de alerta si se detecta `auth_failure` o `disconnected` con mensajes en cola
+- [x] Disparar email de alerta si se detecta `auth_failure` o `disconnected` con mensajes en cola
 - [x] Probar envío manual simple a número de prueba
 
 ---
@@ -97,8 +97,8 @@
 
 ## Fase 8 - Dashboard Localhost
 
-- [ ] Configurar Express con middleware de restricción a localhost
-- [ ] Endpoint REST básico: GET/POST/DELETE mensajes, GET contactos, GET logs
+- [x] Configurar Express con middleware de restricción a localhost
+- [-] Endpoint REST básico: GET/POST/DELETE mensajes, GET contactos, GET logs
 - [ ] Homepage con estado WhatsApp + estado SMTP
 - [ ] Lista de mensajes pendientes con estado visual (colores por status)
 - [ ] Historial de enviados con columna `Entregado` y nivel ACK

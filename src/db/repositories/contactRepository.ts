@@ -124,3 +124,18 @@ export function deleteContact(id: string): void {
     ).run(id);
 }
 
+
+
+/**
+ * Devuelve todos los contactos
+ * @returns 
+ */
+export function findContacts(): Contact[] {
+    return database.prepare(
+        `
+        SELECT * FROM contacts
+        ORDER BY name ASC
+        `
+    ).all() as Contact[];
+
+}

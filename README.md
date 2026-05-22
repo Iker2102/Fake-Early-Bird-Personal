@@ -170,6 +170,35 @@ POST /api/messages
 GET /api/messages
 ```
 
+## Eliminar mensaje programado
+
+```http
+DELETE /api/messages/:id
+```
+
+Ejemplo:
+
+```http
+DELETE /api/messages/52a7e72c-87ec-4f87-8852-e8b5da492137
+```
+
+## Obtener contactos
+
+```http
+GET /api/contacts
+```
+
+Devuleve todos los contactos generados de la base de datos
+
+## Obtener logs de email
+
+```http
+GET /api/logs
+```
+
+Devuelve el historial de logs relacionados con el sistema SMTP y alertas
+
+
 ---
 
 # Estado actual

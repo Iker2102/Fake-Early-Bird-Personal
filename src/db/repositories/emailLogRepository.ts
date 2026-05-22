@@ -70,7 +70,7 @@ export function findEmailLogs(): EmailLog[] {
             `
             SELECT *
             FROM email_logs
-            ORDER BY createdAt DESC
+            ORDER BY COALESCE(createdAt, sentAt) DESC
             `
         )
         .all() as EmailLog[];
