@@ -1,5 +1,6 @@
 import qrcode from "qrcode-terminal";
 import QRCode from "qrcode";
+import { emailQueue } from "../email/mailer.js";
 
 import pkg from "whatsapp-web.js";
 
@@ -147,7 +148,7 @@ whatsappClient.on("disconnected", async (reason) => {
     isWhatsAppReady = false;
 
     const pendingMessages = countPendingMessages();
-    sendDisconnectAlertEmail(reason, pendingMessages);
+
     if (pendingMessages > 0) {
         sendDisconnectAlertEmail(reason, pendingMessages);
     }

@@ -155,6 +155,6 @@ export function sendDisconnectAlertEmail(
             Revisa el dashboard para volver a conectar la sesión.
         </p>
     `;
-
+    console.log(env.NOTIFY_EMAIL);
     emailQueue.enqueue(env.NOTIFY_EMAIL, subject, html);
 }

@@ -70,8 +70,8 @@
 - [x] Instalar `nodemailer` + `@types/nodemailer`
 - [-] Configurar transporte SMTP con credenciales de `.env` (`smtp.mardev.es`)
 - [-] Test de conexión SMTP al arrancar (`transporter.verify()`) con log de resultado
-- [ ] Implementar cola de emails independiente (no bloquea scheduler principal)
-- [ ] Retry de emails fallidos (3 intentos, backoff 1min/5min/15min)
+- [x] Implementar cola de emails independiente (no bloquea scheduler principal)
+- [x] Retry de emails fallidos (3 intentos, backoff 1min/5min/15min)
 - [x] Registrar cada intento de email en tabla `email_logs`
 
 ### Templates HTML a implementar
