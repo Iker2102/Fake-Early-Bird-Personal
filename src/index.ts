@@ -100,7 +100,10 @@ process.on("unhandledRejection", (reason) => {
 
     if (
         message.includes("detached Frame") ||
-        message.includes("Execution context was destroyed")
+        message.includes("Execution context was destroyed") ||
+        message.includes("TargetCloseError") ||
+        message.includes("Target closed") ||
+        message.includes("Protocol error")
     ) {
         console.warn("WhatsApp Web cerró o recargó el navegador interno.");
         return;
@@ -154,3 +157,4 @@ process.on("SIGINT", () => {
 process.on("SIGTERM", () => {
     void shutdown();
 });
+
