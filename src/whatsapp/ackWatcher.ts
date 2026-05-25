@@ -1,5 +1,14 @@
 import { env } from "../config/env.js";
-import { findMessageByWhatsappId, markMessageAsAckFailed, markMessageAsDelivered, requeueMessageByWhatsappId } from "../db/repositories/scheduledMessageRepository.js";
+import {
+    findMessageByWhatsappId,
+    markMessageAsAckFailed,
+    markMessageAsDelivered,
+    requeueMessageByWhatsappId,
+} from "../db/repositories/scheduledMessageRepository.js";
+import {
+    sendDeliverySuccessEmail,
+    sendRetryExhaustedEmail,
+} from "../email/mailer.js";
 
 import { ACK_LEVELS, getAckLabel } from "./ackLevels.js";
 import { clearDeliveryTimeout } from "./deliveryTimeout.js";
@@ -7,11 +16,10 @@ import { clearDeliveryTimeout } from "./deliveryTimeout.js";
 let isAckWatcherRegistered = false;
 
 /**
- * Registra el listener de ACK para actualizar mensajes entregados.
+ * Registra el listener de ACK para actualizar mensajes entregados
  */
 export function registerAckWatcher(client: any): void {
-
-    if(isAckWatcherRegistered) {
+    if (isAckWatcherRegistered) {
         return;
     }
 
@@ -24,7 +32,9 @@ export function registerAckWatcher(client: any): void {
             return;
         }
 
-        console.log(`ACK recibido: ${whatsappMessageId} -> ${ack} (${getAckLabel(ack)})`);
+        console.log(
+            `ACK recibido: ${whatsappMessageId} -> ${ack} (${getAckLabel(ack)})`
+        );
 
         if (ack < ACK_LEVELS.PENDING) {
             const reason = `ack_error_${ack}`;
@@ -36,24 +46,54 @@ export function registerAckWatcher(client: any): void {
 
             if (failedMessage && failedMessage.retryCount < env.RETRY_MAX) {
                 console.warn(`ACK fallido. Reintentando mensaje ${failedMessage.id}`);
+
                 requeueMessageByWhatsappId(whatsappMessageId);
             } else {
                 console.error(`ACK fallido definitivo para ${whatsappMessageId}`);
+
+                if (failedMessage) {
+                    sendRetryExhaustedEmail({
+                        contactName: failedMessage.contactName,
+                        phone: failedMessage.phone,
+                        messageExcerpt: failedMessage.message.slice(0, 120),
+                        retryCount: failedMessage.retryCount,
+                        reason,
+                    });
+                }
             }
 
             return;
         }
 
         if (ack >= ACK_LEVELS.DEVICE) {
-            markMessageAsDelivered(whatsappMessageId, ack);
+            const deliveredAt = new Date().toISOString();
+
+            const deliveredMessage = markMessageAsDelivered(
+                whatsappMessageId,
+                ack,
+                deliveredAt
+            );
+
             clearDeliveryTimeout(whatsappMessageId);
+
+            if (deliveredMessage) {
+                sendDeliverySuccessEmail({
+                    contactName: deliveredMessage.contactName,
+                    phone: deliveredMessage.phone,
+                    messageExcerpt: deliveredMessage.message.slice(0, 120),
+                    ackLevel: ack,
+                    ackLabel: getAckLabel(ack),
+                    deliveredAt,
+                });
+            }
+
             return;
         }
     });
 }
 
 /**
- * Resetea el registro del ack watcher
+ * Resetea el registro del ACK watcher
  */
 export function resetAckWatcher(): void {
     isAckWatcherRegistered = false;

@@ -84,6 +84,8 @@ export const env = {
     DELIVERY_TIMEOUT_MINUTES: getNumberEnv("DELIVERY_TIMEOUT_MINUTES", 10),
 
     RETRY_MAX: getNumberEnv("RETRY_MAX", 3),
+
+    NOTIFY_ON_SUCCESS: getBooleanEnv("NOTIFY_ON_SUCCESS", false),
 };
 
 

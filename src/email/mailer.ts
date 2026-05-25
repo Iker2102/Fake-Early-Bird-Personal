@@ -199,7 +199,10 @@ class EmailQueue {
 export const emailQueue = new EmailQueue();
 
 /**
- * Encola una alerta cuando WhatsApp se desconecta y hay mensajes pendientes.
+ * Encola una alerta cuando WhatsApp se desconecta y hay mensajes pendientes
+ * @param reason 
+ * @param pendingMessagesCount 
+ * @returns 
  */
 export function sendDisconnectAlertEmail(
     reason: string,
@@ -214,6 +217,83 @@ export function sendDisconnectAlertEmail(
     const html = renderEmailTemplate("whatsapp_disconnected.html", {
         reason,
         pendingMessagesCount,
+    });
+
+    emailQueue.enqueue(env.NOTIFY_EMAIL, subject, html);
+}
+
+/**
+ * Envía un email de confirmación cuando un mensaje ha sido entregado correctamente
+ * @param params 
+ * @returns 
+ */
+export function sendDeliverySuccessEmail(params: {
+    contactName: string | null;
+    phone: string;
+    messageExcerpt: string;
+    ackLevel: number;
+    ackLabel: string;
+    deliveredAt: string;
+}): void {
+    if (!env.NOTIFY_ON_SUCCESS) {
+        return;
+    }
+
+    const subject = "Fake Early Bird - Mensaje entregado";
+
+    const html = renderEmailTemplate("delivery_success.html", {
+        contactName: params.contactName ?? "Sin nombre",
+        phone: params.phone,
+        messageExcerpt: params.messageExcerpt,
+        ackLevel: params.ackLevel,
+        ackLabel: params.ackLabel,
+        deliveredAt: params.deliveredAt,
+    });
+
+    emailQueue.enqueue(env.NOTIFY_EMAIL, subject, html);
+}
+
+/**
+ * Envía un email de alerta cuando un mensaje no ha podido entregarse
+ * @param params 
+ */
+export function sendDeliveryFailureEmail(params: {
+    contactName: string | null;
+    phone: string;
+    messageExcerpt: string;
+    reason: string;
+}): void {
+    const subject = "Fake Early Bird - Mensaje fallido";
+
+    const html = renderEmailTemplate("delivery_failure.html", {
+        contactName: params.contactName ?? "Sin nombre",
+        phone: params.phone,
+        messageExcerpt: params.messageExcerpt,
+        reason: params.reason,
+    });
+
+    emailQueue.enqueue(env.NOTIFY_EMAIL, subject, html);
+}
+
+/**
+ * Envía un email crítico cuando un mensaje ha agotado todos los reintentos
+ * @param params 
+ */
+export function sendRetryExhaustedEmail(params: {
+    contactName: string | null;
+    phone: string;
+    messageExcerpt: string;
+    retryCount: number;
+    reason: string;
+}): void {
+    const subject = "Fake Early Bird - Reintentos agotados";
+
+    const html = renderEmailTemplate("retry_exhausted.html", {
+        contactName: params.contactName ?? "Sin nombre",
+        phone: params.phone,
+        messageExcerpt: params.messageExcerpt,
+        retryCount: params.retryCount,
+        reason: params.reason,
     });
 
     emailQueue.enqueue(env.NOTIFY_EMAIL, subject, html);

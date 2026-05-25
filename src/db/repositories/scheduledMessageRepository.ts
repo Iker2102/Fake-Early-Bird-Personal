@@ -175,7 +175,11 @@ export function markMessageAsSent(id: string, whatsappMessageId: string): void {
  * @param whatsappMessageId 
  * @param ackLevel 
  */
-export function markMessageAsDelivered(whatsappMessageId: string, ackLevel: number): void {
+export function markMessageAsDelivered(
+    whatsappMessageId: string,
+    ackLevel: number,
+    deliveredAt = new Date().toISOString()
+): ScheduledMessage | null {
     database
         .prepare(
             `
@@ -186,7 +190,9 @@ export function markMessageAsDelivered(whatsappMessageId: string, ackLevel: numb
             WHERE whatsappMessageId = ?
             `
         )
-        .run(new Date().toISOString(), ackLevel, whatsappMessageId);
+        .run(deliveredAt, ackLevel, whatsappMessageId);
+
+    return findMessageByWhatsappId(whatsappMessageId);
 }
 
 /**

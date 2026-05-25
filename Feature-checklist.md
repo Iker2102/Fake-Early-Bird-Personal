@@ -53,23 +53,23 @@
 - [x] Mapear niveles ACK: `0=pending, 1=server, 2=device, 3=read, 4=played`
 - [x] Al enviar, registrar `messageId` de WhatsApp en BD para correlacionar el ACK
 - [x] Iniciar temporizador de `DELIVERY_TIMEOUT_MINUTES` tras el envío
-- [-] Si llega `ACK_DEVICE (2)` o superior dentro del timeout:
+- [x] Si llega `ACK_DEVICE (2)` o superior dentro del timeout:
   - [x] Actualizar BD: `status=delivered`, `deliveredAt`, `ackLevel`
-  - [ ] Enviar email de confirmación si `NOTIFY_ON_SUCCESS=true`
+  - [x] Enviar email de confirmación si `NOTIFY_ON_SUCCESS=true`
 - [x] Si expira el timeout sin `ACK_DEVICE`:
   - [x] Actualizar BD: `status=delivery_failed`, `failReason=timeout`
-  - [ ] Disparar email de alerta inmediatamente
-- [-] Si `message_ack` devuelve error explícito:
+  - [x] Disparar email de alerta inmediatamente
+- [x] Si `message_ack` devuelve error explícito:
   - [x] Actualizar BD: `status=failed`, `failReason=<error>`
-  - [-] Disparar retry si `retryCount < RETRY_MAX`, si no → email de alerta
+  - [x] Disparar retry si `retryCount < RETRY_MAX`, si no → email de alerta
 
 ---
 
 ## Fase 6 - Módulo de Email (Nodemailer + SMTP) ⭐ NUEVO
 
 - [x] Instalar `nodemailer` + `@types/nodemailer`
-- [-] Configurar transporte SMTP con credenciales de `.env` (`smtp.mardev.es`)
-- [-] Test de conexión SMTP al arrancar (`transporter.verify()`) con log de resultado
+- [x] Configurar transporte SMTP con credenciales de `.env` (`smtp.mardev.es`)
+- [x] Test de conexión SMTP al arrancar (`transporter.verify()`) con log de resultado
 - [x] Implementar cola de emails independiente (no bloquea scheduler principal)
 - [x] Retry de emails fallidos (3 intentos, backoff 1min/5min/15min)
 - [x] Registrar cada intento de email en tabla `email_logs`
