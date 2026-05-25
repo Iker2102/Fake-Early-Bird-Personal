@@ -93,3 +93,19 @@ export function findEmailLogsByMessageId(messageId: string): EmailLog[] {
         )
         .all(messageId) as EmailLog[];
 }
+
+export function countSentEmailsToday(dayStart: string, dayEnd: string): number {
+    const result = database
+        .prepare(
+            `
+            SELECT COUNT(*) as total
+            FROM email_logs
+            WHERE status = 'sent'
+              AND createdAt >= ?
+              AND createdAt < ?
+            `
+        )
+        .get(dayStart, dayEnd) as { total: number };
+
+    return result.total;
+}

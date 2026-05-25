@@ -385,3 +385,32 @@ export function deleteScheduledMessage(id: string): void {
         `
     ).run(id);
 }
+
+
+export function getMessageStatsForToday(dayStart: string, dayEnd: string): {
+    sentToday: number;
+    deliveredToday: number;
+    failedToday: number;
+} {
+    const result = database
+        .prepare(
+            `
+            SELECT
+                SUM(CASE WHEN status IN ('sent', 'delivered') AND sentAt >= @dayStart AND sentAt < @dayEnd THEN 1 ELSE 0 END) as sentToday,
+                SUM(CASE WHEN status = 'delivered' AND deliveredAt >= @dayStart AND deliveredAt < @dayEnd THEN 1 ELSE 0 END) as deliveredToday,
+                SUM(CASE WHEN status IN ('failed', 'delivery_failed') AND createdAt >= @dayStart AND createdAt < @dayEnd THEN 1 ELSE 0 END) as failedToday
+            FROM scheduled_messages
+            `
+        )
+        .get({ dayStart, dayEnd }) as {
+            sentToday: number | null;
+            deliveredToday: number | null;
+            failedToday: number | null;
+        };
+
+    return {
+        sentToday: result.sentToday ?? 0,
+        deliveredToday: result.deliveredToday ?? 0,
+        failedToday: result.failedToday ?? 0,
+    };
+}

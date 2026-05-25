@@ -9,6 +9,9 @@ import { findEmailLogs } from "../db/repositories/emailLogRepository.js"
 
 import { deleteScheduledMessage } from "../db/repositories/scheduledMessageRepository.js";
 
+import { getMessageStatsForToday } from "../db/repositories/scheduledMessageRepository.js";
+import { countSentEmailsToday } from "../db/repositories/emailLogRepository.js";
+
 
 export const apiRouter = Router();
 
@@ -109,5 +112,37 @@ apiRouter.delete("/messages/:id", (req, res) => {
 
     res.json({
         status: "deleted",
+    });
+});
+
+
+apiRouter.get("/stats", (_req, res) => {
+    const now = new Date();
+
+    const dayStart = new Date(now);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(now);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    const messageStats = getMessageStatsForToday(
+        dayStart.toISOString(),
+        dayEnd.toISOString()
+    );
+
+    const emailsSentToday = countSentEmailsToday(
+        dayStart.toISOString(),
+        dayEnd.toISOString()
+    );
+
+    const deliveryRate =
+        messageStats.sentToday === 0
+            ? 0
+            : Math.round((messageStats.deliveredToday / messageStats.sentToday) * 100);
+
+    res.json({
+        ...messageStats,
+        deliveryRate,
+        emailsSentToday,
     });
 });

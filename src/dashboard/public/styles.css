@@ -176,6 +176,29 @@ th {
     text-align: center;
 }
 
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-card span {
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.stat-card strong {
+    font-size: 30px;
+}
+
 @media (max-width: 760px) {
     .status-grid,
     .form-grid {
@@ -185,5 +208,9 @@ th {
     .header {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
     }
 }

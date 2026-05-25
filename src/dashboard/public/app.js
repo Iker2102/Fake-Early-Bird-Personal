@@ -202,6 +202,7 @@ async function refreshDashboard() {
     await Promise.all([
         loadWhatsAppStatus(),
         loadMessages(),
+        loadStats(),
     ]);
 }
 
@@ -211,3 +212,20 @@ refreshButton.addEventListener("click", refreshDashboard);
 refreshDashboard();
 
 setInterval(refreshDashboard, 5000);
+
+
+
+const sentTodayEl = document.getElementById("sent-today");
+const deliveredTodayEl = document.getElementById("delivered-today");
+const deliveryRateEl = document.getElementById("delivery-rate");
+const emailsSentTodayEl = document.getElementById("emails-sent-today");
+
+async function loadStats() {
+    const response = await fetch("/api/stats");
+    const stats = await response.json();
+
+    sentTodayEl.textContent = stats.sentToday;
+    deliveredTodayEl.textContent = stats.deliveredToday;
+    deliveryRateEl.textContent = `${stats.deliveryRate}%`;
+    emailsSentTodayEl.textContent = stats.emailsSentToday;
+}
