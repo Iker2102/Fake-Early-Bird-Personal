@@ -63,6 +63,7 @@ app.use("/api", apiRouter);
 /**
  * Registra que solo se use desde local
  */
+app.set("trust proxy", true);
 app.use(localOnly);
 
 /**

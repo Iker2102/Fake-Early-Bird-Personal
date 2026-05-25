@@ -1,50 +1,98 @@
 <!doctype html>
 <html lang="es">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Fake Early Bird</title>
-        <link rel="stylesheet" href="./styles.css" />
-    </head>
-    <body>
-        <main class="container">
-            <h1>Fake Early Bird</h1>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fake Early Bird Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+    <main class="dashboard">
+        <header class="header">
+            <div>
+                <h1>Fake Early Bird</h1>
+                <p>Dashboard local de WhatsApp, SMTP y mensajes programados</p>
+            </div>
+            <button id="refresh-button">Actualizar</button>
+        </header>
 
-            <section class="card">
-                <h2>Estado WhatsApp</h2>
-                <p id="wa-status">Cargando...</p>
-                <img id="qr" alt="QR de WhatsApp" />
-            </section>
+        <section class="status-grid">
+            <article class="card">
+                <h2>WhatsApp</h2>
+                <p id="whatsapp-status" class="status-badge">Cargando...</p>
+                <div id="qr-container" class="qr-container"></div>
+            </article>
 
-            <section class="card">
-                <h2>Enviar mensaje de prueba</h2>
+            <article class="card">
+                <h2>SMTP</h2>
+                <p id="smtp-status" class="status-badge">Configurado</p>
+                <p class="muted">El estado real se comprueba al arrancar la aplicación.</p>
+            </article>
+        </section>
 
-                <form id="send-form">
-                    <label>
-                        Teléfono
-                        <input
-                            type="text"
-                            id="phone"
-                            placeholder="+34600111222"
-                            required
-                        />
-                    </label>
+        <section class="card">
+            <h2>Programar mensaje</h2>
 
-                    <label>
-                        Mensaje
-                        <textarea
-                            id="message"
-                            placeholder="Escribe el mensaje..."
-                            required
-                        ></textarea>
-                    </label>
+            <form id="schedule-form" class="form-grid">
+                <label>
+                    Teléfono
+                    <input id="phone" type="text" placeholder="+34600111222" required />
+                </label>
 
-                    <button type="submit">Enviar mensaje</button>
-                </form>
+                <label>
+                    Fecha y hora
+                    <input id="scheduledAt" type="datetime-local" required />
+                </label>
 
-                <p id="status"></p>
-            </section>
-        </main>
+                <label class="full">
+                    Mensaje
+                    <textarea id="message" rows="4" placeholder="Escribe el mensaje..." required></textarea>
+                </label>
 
-        <script src="./app.js"></script>
-    </body>
+                <button type="submit">Programar mensaje</button>
+            </form>
+
+            <p id="form-status" class="muted"></p>
+        </section>
+
+        <section class="card">
+            <h2>Mensajes pendientes</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Teléfono</th>
+                            <th>Mensaje</th>
+                            <th>Programado</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-messages"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Historial de enviados</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Teléfono</th>
+                            <th>Mensaje</th>
+                            <th>Enviado</th>
+                            <th>Entregado</th>
+                            <th>ACK</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sent-messages"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="./app.js"></script>
+</body>
 </html>
