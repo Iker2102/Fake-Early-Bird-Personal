@@ -7,6 +7,8 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    environment:
+      - RUNNING_IN_DOCKER=true
     volumes:
       - .:/app
       - /app/node_modules

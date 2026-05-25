@@ -98,11 +98,11 @@
 ## Fase 8 - Dashboard Localhost
 
 - [x] Configurar Express con middleware de restricción a localhost
-- [-] Endpoint REST básico: GET/POST/DELETE mensajes, GET contactos, GET logs
-- [ ] Homepage con estado WhatsApp + estado SMTP
-- [ ] Lista de mensajes pendientes con estado visual (colores por status)
-- [ ] Historial de enviados con columna `Entregado` y nivel ACK
-- [ ] Formulario de programación de nuevo mensaje
+- [x] Endpoint REST básico: GET/POST/DELETE mensajes, GET contactos, GET logs
+- [x] Homepage con estado WhatsApp + estado SMTP
+- [x] Lista de mensajes pendientes con estado visual (colores por status)
+- [x] Historial de enviados con columna `Entregado` y nivel ACK
+- [x] Formulario de programación de nuevo mensaje
 - [ ] Panel de logs en tiempo real (SSE: `GET /api/logs/stream`)
 - [ ] Estadísticas: enviados hoy, tasa de entrega, emails enviados
 

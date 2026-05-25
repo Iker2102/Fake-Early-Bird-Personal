@@ -16,6 +16,8 @@ import { registerAckWatcher, resetAckWatcher } from "./ackWatcher.js";
 
 import { cleanupWhatsAppSessionLocks } from "./sessionCleanup.js";
 
+import { killOrphanChromiumProcesses } from "./chromiumCleanup.js";
+
 
 let isWhatsAppReady = false;
 
@@ -57,6 +59,8 @@ export async function initializeWhatsAppClient(): Promise<void> {
 
     isInitializing = true;
 
+    await killOrphanChromiumProcesses();
+
     cleanupWhatsAppSessionLocks();
 
     whatsappClient = new Client({
@@ -65,15 +69,14 @@ export async function initializeWhatsAppClient(): Promise<void> {
     }),
     puppeteer: {
         headless: true,
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         args: [
-                "--no-sandbox",
-                "--disable-setuid-sandbox",
-                "--disable-dev-shm-usage",
-                "--disable-gpu",
-                "--no-first-run",
-                "--no-zygote",
-                "--disable-extensions",
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+            "--no-first-run",
+            "--no-zygote",
+            "--disable-extensions",
         ],
     },
 });
@@ -162,40 +165,61 @@ whatsappClient.on("disconnected", async (reason) => {
 
 try {
     await whatsappClient.initialize();
-    } catch (error) {
+} catch (error) {
 
-        const errorMessage =
-            error instanceof Error ? error.message : String(error);
+    const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
-        whatsappStatus = "error";
-        isWhatsAppReady = false;
+    whatsappStatus = "error";
+    isWhatsAppReady = false;
 
-        console.error("Error inicializando WhatsApp:", error);
+    console.error("Error inicializando WhatsApp:", error);
 
-        /**
-         * Error de permisos en Linux/macOS, porque si hago chown, el sería inseguro y no funcionaría en todos los entornos
-         */
-        if (errorMessage.includes("EACCES")) {
-            whatsappClient = null;
-            isInitializing = false;
-
-            console.error(
-                "Error de permisos en la sesión de WhatsApp. Revisa .wwebjs_auth."
-            );
-
-            return;
-        }
-
-        /**
-         * Para otros errores sí intentamos reconectar
-         */
-        await destroyWhatsAppClient();
-
-        scheduleReconnect();
-
-    } finally {
+    /**
+     * Error de permisos en Linux/macOS
+     */
+    if (errorMessage.includes("EACCES")) {
+        whatsappClient = null;
         isInitializing = false;
+
+        console.error(
+            "Error de permisos en la sesión de WhatsApp. Revisa .wwebjs_auth."
+        );
+
+        return;
     }
+
+    /**
+     * Perfil Chromium bloqueado por procesos antiguos
+     */
+    const isProfileLockedError =
+        errorMessage.includes("profile appears to be in use") ||
+        errorMessage.includes("process_singleton") ||
+        errorMessage.includes("Code: 21") ||
+        errorMessage.includes("Code: 70") ||
+        errorMessage.includes("Code: 71");
+
+    if (isProfileLockedError) {
+        console.warn(
+            "Perfil Chromium bloqueado. Limpiando procesos y locks..."
+        );
+
+        await killOrphanChromiumProcesses();
+
+        cleanupWhatsAppSessionLocks();
+    }
+
+    /**
+     * Para otros errores sí intentamos reconectar
+     */
+    await destroyWhatsAppClient();
+
+    scheduleReconnect();
+
+} finally {
+    isInitializing = false;
+}
+
 }
 
 
@@ -205,6 +229,10 @@ try {
  * @returns 
  */
 function scheduleReconnect(): void {
+    if (reconnectTimeout) {
+        return;
+    }
+
     if (reconnectAttempts >= env.WA_RECONNECT_MAX_ATTEMPTS) {
         console.error("Número máximo de intentos de reconexión alcanzado");
         return;
@@ -218,6 +246,8 @@ function scheduleReconnect(): void {
     console.log(`Reintentando conexión de WhatsApp en ${delayMs / 1000} segundos...`);
 
     reconnectTimeout = setTimeout(async () => {
+        reconnectTimeout = null;
+
         try {
             await initializeWhatsAppClient();
         } catch (error) {

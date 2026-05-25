@@ -1,28 +1,26 @@
-FROM node:22-bookworm
+FROM ghcr.io/puppeteer/puppeteer:latest
+
+USER root
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    chromium \
-    fonts-liberation \
-    libnss3 \
-    libxss1 \
-    libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    libgbm1 \
-    libasound2 \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
-RUN mkdir -p dist/dashboard && cp -r src/dashboard/public dist/dashboard/public
+
+RUN mkdir -p dist/dashboard \
+    && cp -r src/dashboard/public dist/dashboard/public
+
+RUN mkdir -p /app/.wwebjs_auth /app/.wwebjs_cache /app/data \
+    && chown -R pptruser:pptruser /app
+
+USER pptruser
+
+RUN npx puppeteer browsers install chrome
 
 EXPOSE 3000
 
