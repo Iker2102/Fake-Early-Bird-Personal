@@ -103,19 +103,19 @@
 - [x] Lista de mensajes pendientes con estado visual (colores por status)
 - [x] Historial de enviados con columna `Entregado` y nivel ACK
 - [x] Formulario de programación de nuevo mensaje
-- [ ] Panel de logs en tiempo real (SSE: `GET /api/logs/stream`)
+- [x] Panel de logs en tiempo real (SSE: `GET /api/logs/stream`)
 - [x] Estadísticas: enviados hoy, tasa de entrega, emails enviados
 
 ---
 
 ## Fase 9 - Gestión de Contactos
 
-- [ ] CRUD de contactos desde dashboard
-- [ ] Búsqueda por nombre o número
-- [ ] Sistema de favoritos y etiquetas
+- [x] CRUD de contactos desde dashboard
+- [x] Búsqueda por nombre o número
+- [x] Sistema de favoritos y etiquetas
 - [ ] Historial de mensajes por contacto
 - [ ] Importación desde CSV
-- [ ] Exportación a CSV/JSON
+- [x] Exportación a CSV/JSON
 
 ---
 

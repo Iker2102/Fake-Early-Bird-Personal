@@ -124,8 +124,6 @@ export function deleteContact(id: string): void {
     ).run(id);
 }
 
-
-
 /**
  * Devuelve todos los contactos
  * @returns 
@@ -138,4 +136,55 @@ export function findContacts(): Contact[] {
         `
     ).all() as Contact[];
 
+}
+
+/**
+ * Busca contactos por nombre, teléfono o etiquetas
+ * @param query 
+ * @returns 
+ */
+export function searchContacts(query: string): Contact[] {
+    return database
+        .prepare(
+            `
+            SELECT *
+            FROM contacts
+            WHERE name LIKE ?
+               OR phone LIKE ?
+               OR tags LIKE ?
+            ORDER BY name ASC
+            `
+        )
+        .all(`%${query}%`, `%${query}%`, `%${query}%`) as Contact[];
+}
+
+
+/**
+ * Actualiza parcialmente un contacto existente
+ * Solo se modifican los campos enviados
+ * @param id 
+ * @param input 
+ */
+export function updateContact(
+    id: string,
+    input: Partial<CreateContactInput>
+): void {
+    database
+        .prepare(
+            `
+            UPDATE contacts
+            SET name = COALESCE(@name, name),
+                phone = COALESCE(@phone, phone),
+                tags = COALESCE(@tags, tags),
+                priority = COALESCE(@priority, priority)
+            WHERE id = @id
+            `
+        )
+        .run({
+            id,
+            name: input.name ?? null,
+            phone: input.phone ?? null,
+            tags: input.tags ?? null,
+            priority: input.priority ?? null,
+        });
 }

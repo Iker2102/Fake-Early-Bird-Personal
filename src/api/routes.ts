@@ -4,8 +4,14 @@ import { getWhatsAppStatus } from "../whatsapp/client.js";
 import { sendManualMessage } from "../whatsapp/sender.js";
 import { createScheduledMessage, findScheduledMessages, } from "../db/repositories/scheduledMessageRepository.js";
 
-import { findContacts } from "../db/repositories/contactRepository.js"
-import { findEmailLogs } from "../db/repositories/emailLogRepository.js"
+import {
+    createContact,
+    deleteContact,
+    findContactById,
+    findContacts,
+    searchContacts,
+    updateContact,
+} from "../db/repositories/contactRepository.js";import { findEmailLogs } from "../db/repositories/emailLogRepository.js"
 
 import { deleteScheduledMessage } from "../db/repositories/scheduledMessageRepository.js";
 
@@ -13,6 +19,8 @@ import { getMessageStatsForToday } from "../db/repositories/scheduledMessageRepo
 import { countSentEmailsToday } from "../db/repositories/emailLogRepository.js";
 
 import { streamLogs } from "./logStream.js";
+
+import type { Request } from "express";
 
 
 export const apiRouter = Router();
@@ -88,13 +96,6 @@ apiRouter.get("/messages", (_req, res) => {
     res.json(findScheduledMessages());
 });
 
-/**
- * Lista los contactos
- */
-apiRouter.get("/contacts", (_req, res) => {
-    res.json(findContacts());
-});
-
 
 /**
  * Lista los logs
@@ -157,3 +158,156 @@ apiRouter.get("/stats", (_req, res) => {
 apiRouter.get("/logs/stream", (_req, res) => {
     streamLogs(res);
 });
+
+
+/**
+ * Obtiene todos los contactos o filtra por búsqueda
+ * Puede buscar por nombre, teléfono o etiquetas
+ */
+apiRouter.get("/contacts", (req, res) => {
+    const query = String(req.query.q ?? "").trim();
+
+    if (query) {
+        res.json(searchContacts(query));
+        return;
+    }
+
+    res.json(findContacts());
+});
+
+
+/**
+ * Obtiene un contacto específico por ID
+ */
+apiRouter.get("/contacts/:id", (req, res) => {
+    const contact = findContactById(req.params.id);
+
+    if (!contact) {
+        res.status(404).json({ error: "Contacto no encontrado" });
+        return;
+    }
+
+    res.json(contact);
+});
+
+/**
+ * Crea un nuevo contacto
+ * Controla errores de teléfono duplicado
+ */
+apiRouter.post("/contacts", (req, res) => {
+    try {
+        const contact = createContact({
+            name: req.body.name,
+            phone: req.body.phone,
+            tags: req.body.tags ?? null,
+            priority: req.body.priority ?? "normal",
+        });
+
+        res.status(201).json(contact);
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        if (message.includes("UNIQUE constraint failed: contacts.phone")) {
+            res.status(409).json({
+                error: "Ya existe un contacto con ese teléfono",
+            });
+
+            return;
+        }
+
+        res.status(500).json({
+            error: "No se pudo crear el contacto",
+        });
+    }
+});
+
+/**
+ * Actualiza parcialmente un contacto existente
+ */
+apiRouter.put("/contacts/:id", (req, res) => {
+    updateContact(req.params.id, {
+        name: req.body.name,
+        phone: req.body.phone,
+        tags: req.body.tags,
+        priority: req.body.priority,
+    });
+
+    res.json({ status: "updated" });
+});
+
+/**
+ * Elimina un contacto por id
+ */
+apiRouter.delete("/contacts/:id", (req, res) => {
+    deleteContact(req.params.id);
+
+    res.json({ status: "deleted" });
+});
+
+/**
+ * Exporta los contactos filtrados en formato JSON
+ */
+apiRouter.get("/contacts/export/json", (req, res) => {
+    const contacts = getFilteredContacts(req);
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=contacts.json"
+    );
+
+    res.send(JSON.stringify(contacts, null, 2));
+});
+
+/**
+ * Exporta los contactos filtrados en formato CSV
+ */
+apiRouter.get("/contacts/export/csv", (req, res) => {
+    const contacts = getFilteredContacts(req);
+
+    const header = "name,phone,tags,priority,lastInteraction";
+
+    const rows = contacts.map((contact) =>
+        [
+            contact.name,
+            contact.phone,
+            contact.tags ?? "",
+            contact.priority,
+            contact.lastInteraction ?? "",
+        ]
+            .map((value) => `"${String(value).replaceAll('"', '""')}"`)
+            .join(",")
+    );
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=contacts.csv"
+    );
+
+    res.send([header, ...rows].join("\n"));
+});
+
+/**
+ * Obtiene contactos aplicando filtros opcionales
+ * @param req 
+ * @returns 
+ */
+function getFilteredContacts(req: Request) {
+    const query = String(req.query.q ?? "").trim();
+    const onlyFavorites = req.query.favorites === "true";
+
+    let contacts = query
+        ? searchContacts(query)
+        : findContacts();
+
+    if (onlyFavorites) {
+        contacts = contacts.filter(
+            (contact) => contact.priority === "favorite"
+        );
+    }
+
+    return contacts;
+}
+
+

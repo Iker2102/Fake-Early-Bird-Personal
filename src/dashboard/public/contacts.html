@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contactos - Fake Early Bird</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+    <main class="dashboard">
+        <header class="header">
+            <div class="header-top">
+                <div>
+                    <h1>Contactos</h1>
+                    <p>Gestión de contactos guardados</p>
+                </div>
+
+                <div class="header-actions">
+                    <a class="nav-link" href="./index.html">
+                        Dashboard
+                    </a>
+
+                    <a class="nav-link active" href="./contacts.html">
+                        Contactos
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <section class="card">
+            <h2>Nuevo contacto</h2>
+
+            <form id="contact-form" class="form-grid">
+                <label>
+                    Nombre
+                    <input id="contact-name" type="text" required />
+                </label>
+
+                <label>
+                    Teléfono
+                    <input id="contact-phone" type="text" required />
+                </label>
+
+                <label>
+                    Etiquetas
+                    <input
+                        id="contact-tags"
+                        type="text"
+                        placeholder="cliente,vip"
+                    />
+                </label>
+
+                <label>
+                    Prioridad
+                    <select id="contact-priority">
+                        <option value="normal">Normal</option>
+                        <option value="favorite">Favorito</option>
+                    </select>
+                </label>
+
+                <button type="submit">
+                    Guardar contacto
+                </button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Buscar contacto</h2>
+
+            <input
+                id="contact-search"
+                type="text"
+                placeholder="Buscar por nombre o número..."
+            />
+        </section>
+
+        <div class="contact-filters">
+            <button id="show-all-contacts" class="filter-button active">Todos</button>
+            <button id="show-favorite-contacts" class="filter-button">⭐ Favoritos</button>
+
+            <button id="export-csv-button" class="filter-button">
+                Exportar CSV
+            </button>
+
+            <button id="export-json-button" class="filter-button">
+                Exportar JSON
+            </button>
+        </div>
+
+        <section class="card">
+            <h2>Lista de contactos</h2>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th>Etiquetas</th>
+                            <th>Prioridad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="contacts-table"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="./contacts.js"></script>
+</body>
+</html>
