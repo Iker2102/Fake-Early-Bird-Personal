@@ -5,6 +5,8 @@ import { createEmailLog } from "../db/repositories/emailLogRepository.js";
 
 import { renderEmailTemplate } from "./templateRenderer.js";
 
+import { pushLog } from "../api/logStream.js";
+
 const transporter = nodemailer.createTransport({
     host: env.SMTP_HOST,
     port: env.SMTP_PORT,
@@ -73,6 +75,8 @@ class EmailQueue {
         console.log(
             `[EmailQueue] Job encolado (id=${job.id}, total=${this.queue.length})`
         );
+
+        pushLog("info", `Email encolado: ${subject}`);
 
         if (!this.isRunning) {
             this.startWorker();
@@ -159,11 +163,15 @@ class EmailQueue {
             createEmailLog(job.to, job.subject, "sent");
 
             console.log(`[EmailQueue] Email enviado (id=${job.id})`);
+
+            pushLog("info", `Email enviado: ${job.subject}`);
         } catch (error) {
             const message =
                 error instanceof Error ? error.message : "Error desconocido";
 
             console.error(`[EmailQueue] Fallo al enviar id=${job.id}: ${message}`);
+            
+            pushLog("error", `Error enviando email: ${message}`);
 
             if (job.attempts < MAX_ATTEMPTS) {
                 const retryDelayMs =

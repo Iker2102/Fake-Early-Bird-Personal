@@ -104,7 +104,7 @@
 - [x] Historial de enviados con columna `Entregado` y nivel ACK
 - [x] Formulario de programación de nuevo mensaje
 - [ ] Panel de logs en tiempo real (SSE: `GET /api/logs/stream`)
-- [ ] Estadísticas: enviados hoy, tasa de entrega, emails enviados
+- [x] Estadísticas: enviados hoy, tasa de entrega, emails enviados
 
 ---
 

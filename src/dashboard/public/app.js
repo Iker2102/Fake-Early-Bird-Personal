@@ -229,3 +229,26 @@ async function loadStats() {
     deliveryRateEl.textContent = `${stats.deliveryRate}%`;
     emailsSentTodayEl.textContent = stats.emailsSentToday;
 }
+
+
+const liveLogsEl = document.getElementById("live-logs");
+
+function connectLogStream() {
+    const eventSource = new EventSource("/api/logs/stream");
+
+    eventSource.onmessage = (event) => {
+        const log = JSON.parse(event.data);
+
+        const item = document.createElement("div");
+        item.className = `log-item log-${log.level}`;
+        item.textContent = `[${new Date(log.createdAt).toLocaleTimeString("es-ES")}] ${log.message}`;
+
+        liveLogsEl.prepend(item);
+    };
+
+    eventSource.onerror = () => {
+        console.warn("SSE desconectado, reintentando...");
+    };
+}
+
+connectLogStream();

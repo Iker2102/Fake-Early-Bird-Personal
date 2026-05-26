@@ -12,6 +12,8 @@ import { deleteScheduledMessage } from "../db/repositories/scheduledMessageRepos
 import { getMessageStatsForToday } from "../db/repositories/scheduledMessageRepository.js";
 import { countSentEmailsToday } from "../db/repositories/emailLogRepository.js";
 
+import { streamLogs } from "./logStream.js";
+
 
 export const apiRouter = Router();
 
@@ -115,7 +117,9 @@ apiRouter.delete("/messages/:id", (req, res) => {
     });
 });
 
-
+/**
+ * Devuelve estadísticas generales del sistema para el dashboard
+ */
 apiRouter.get("/stats", (_req, res) => {
     const now = new Date();
 
@@ -145,4 +149,11 @@ apiRouter.get("/stats", (_req, res) => {
         deliveryRate,
         emailsSentToday,
     });
+});
+
+/**
+ * Stream SSE para enviar logs en tiempo real al dashboard
+ */
+apiRouter.get("/logs/stream", (_req, res) => {
+    streamLogs(res);
 });
