@@ -11,6 +11,65 @@ const exportJsonButton = document.getElementById("export-json-button");
 const historyContactName = document.getElementById("history-contact-name");
 const contactHistoryTable = document.getElementById("contact-history-table");
 
+const importCsvInput = document.getElementById("import-csv-input");
+
+
+function parseCsv(text) {
+    const lines = text
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+    const [, ...rows] = lines;
+
+    return rows.map((row) => {
+        const [name, phone, tags, priority] = row.split(";");
+
+        return {
+            name: name?.trim(),
+            phone: phone?.trim(),
+            tags: tags?.trim() || null,
+            priority: priority?.trim() || "normal",
+        };
+    });
+}
+
+async function importContactsFromCsv(file) {
+    const text = await file.text();
+    const contacts = parseCsv(text);
+
+    let created = 0;
+    let skipped = 0;
+
+    for (const contact of contacts) {
+        if (!contact.name || !contact.phone) {
+            skipped++;
+            continue;
+        }
+
+        const response = await fetch("/api/contacts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(contact),
+        });
+
+        if (response.ok) {
+            created++;
+        } else {
+            skipped++;
+        }
+    }
+
+    alert(`Importación terminada: ${created} creados, ${skipped} omitidos`);
+
+    importCsvInput.value = "";
+
+    await loadContacts(searchInput.value.trim());
+}
+
+
 let onlyFavorites = false;
 
 async function loadContacts(query = "") {
@@ -292,3 +351,14 @@ exportJsonButton.addEventListener("click", () => {
 });
 
 setFilterMode(false);
+
+
+importCsvInput.addEventListener("change", async () => {
+    const file = importCsvInput.files?.[0];
+
+    if (!file) {
+        return;
+    }
+
+    await importContactsFromCsv(file);
+});

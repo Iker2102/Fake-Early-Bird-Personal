@@ -113,8 +113,8 @@
 - [x] CRUD de contactos desde dashboard
 - [x] Búsqueda por nombre o número
 - [x] Sistema de favoritos y etiquetas
-- [ ] Historial de mensajes por contacto
-- [ ] Importación desde CSV
+- [x] Historial de mensajes por contacto
+- [x] Importación desde CSV
 - [x] Exportación a CSV/JSON
 
 ---
