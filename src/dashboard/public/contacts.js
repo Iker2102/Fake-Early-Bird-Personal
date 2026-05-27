@@ -8,6 +8,9 @@ const showFavoriteButton = document.getElementById("show-favorite-contacts");
 const exportCsvButton = document.getElementById("export-csv-button");
 const exportJsonButton = document.getElementById("export-json-button");
 
+const historyContactName = document.getElementById("history-contact-name");
+const contactHistoryTable = document.getElementById("contact-history-table");
+
 let onlyFavorites = false;
 
 async function loadContacts(query = "") {
@@ -61,6 +64,10 @@ function renderContacts(contacts) {
                 ${contact.priority === "favorite" ? "⭐" : "—"}
             </td>
             <td class="actions-cell">
+                <button class="secondary history-button">
+                    Historial
+                </button>
+
                 <button class="secondary favorite-button">
                     ${contact.priority === "favorite" ? "Quitar" : "Favorito"}
                 </button>
@@ -70,6 +77,10 @@ function renderContacts(contacts) {
                 </button>
             </td>
         `;
+
+        row.querySelector(".history-button").addEventListener("click", async () => {
+            await loadContactHistory(contact);
+        });
 
         row.querySelector(".favorite-button").addEventListener("click", async () => {
             await updateContact(contact.id, {
@@ -84,6 +95,44 @@ function renderContacts(contacts) {
         });
 
         contactsTable.appendChild(row);
+    }
+}
+
+async function loadContactHistory(contact) {
+    historyContactName.textContent = `Historial de ${contact.name} (${contact.phone})`;
+
+    const response = await fetch(`/api/contacts/${contact.id}/messages`);
+    const messages = await response.json();
+
+    contactHistoryTable.innerHTML = "";
+
+    if (messages.length === 0) {
+        contactHistoryTable.innerHTML = `
+            <tr>
+                <td colspan="5" class="empty">
+                    Este contacto todavía no tiene mensajes.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    for (const message of messages) {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${shorten(message.message)}</td>
+            <td>${formatDate(message.scheduledAt)}</td>
+            <td>${formatDate(message.sentAt)}</td>
+            <td>
+                <span class="status-badge ${getStatusClass(message.status)}">
+                    ${message.status}
+                </span>
+            </td>
+            <td>${message.ackLevel ?? "-"}</td>
+        `;
+
+        contactHistoryTable.appendChild(row);
     }
 }
 
@@ -129,6 +178,39 @@ function formatTags(tags) {
         .filter(Boolean)
         .map((tag) => `<span class="tag-chip">${tag}</span>`)
         .join(" ");
+}
+
+function formatDate(value) {
+    if (!value) {
+        return "-";
+    }
+
+    return new Date(value).toLocaleString("es-ES");
+}
+
+function getStatusClass(status) {
+    const classes = {
+        scheduled: "badge-blue",
+        sending: "badge-yellow",
+        sent: "badge-purple",
+        delivered: "badge-green",
+        delivery_failed: "badge-red",
+        failed: "badge-red",
+    };
+
+    return classes[status] ?? "badge-gray";
+}
+
+function shorten(text, length = 80) {
+    if (!text) {
+        return "";
+    }
+
+    if (text.length <= length) {
+        return text;
+    }
+
+    return `${text.slice(0, length)}...`;
 }
 
 async function createContact(event) {

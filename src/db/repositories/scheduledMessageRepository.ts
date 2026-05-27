@@ -414,3 +414,18 @@ export function getMessageStatsForToday(dayStart: string, dayEnd: string): {
         failedToday: result.failedToday ?? 0,
     };
 }
+
+
+
+export function findMessagesByPhone(phone: string): ScheduledMessage[] {
+    return database
+        .prepare(
+            `
+            SELECT *
+            FROM scheduled_messages
+            WHERE phone = ?
+            ORDER BY createdAt DESC
+            `
+        )
+        .all(phone) as ScheduledMessage[];
+}

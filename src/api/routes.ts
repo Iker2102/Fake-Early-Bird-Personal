@@ -22,6 +22,8 @@ import { streamLogs } from "./logStream.js";
 
 import type { Request } from "express";
 
+import { findMessagesByPhone } from "../db/repositories/scheduledMessageRepository.js";
+
 
 export const apiRouter = Router();
 
@@ -288,6 +290,8 @@ apiRouter.get("/contacts/export/csv", (req, res) => {
     res.send([header, ...rows].join("\n"));
 });
 
+
+
 /**
  * Obtiene contactos aplicando filtros opcionales
  * @param req 
@@ -309,5 +313,18 @@ function getFilteredContacts(req: Request) {
 
     return contacts;
 }
+
+apiRouter.get("/contacts/:id/messages", (req, res) => {
+    const contact = findContactById(req.params.id);
+
+    if (!contact) {
+        res.status(404).json({ error: "Contacto no encontrado" });
+        return;
+    }
+
+    res.json(findMessagesByPhone(contact.phone));
+});
+
+
 
 
