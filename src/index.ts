@@ -15,6 +15,9 @@ import { startBackupScheduler } from "./scheduler/backupCron.js";
 
 import { localOnly } from "./api/localOnly.js";
 
+import { errorHandler } from "./api/errorHandler.js";
+import { logError } from "./utils/logger.js";
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -58,7 +61,7 @@ app.use(express.json());
  * Registra las rutas principales de la API
  */
 app.use("/api", apiRouter);
-
+app.use(errorHandler);
 
 /**
  * Registra que solo se use desde local
@@ -117,7 +120,11 @@ process.on("unhandledRejection", (reason) => {
  * Captura errores no controlados para evitar cierres silenciosos
  */
 process.on("uncaughtException", (error) => {
-    console.error("Uncaught exception:", error);
+    logError("Uncaught exception:", error);
+});
+
+process.on("unhandledRejection", (reason) => {
+    console.error("Unhandled rejection:", reason);
 });
 
 /**

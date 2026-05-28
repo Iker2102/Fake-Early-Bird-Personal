@@ -121,11 +121,11 @@
 
 ## Fase 10 - Seguridad
 
-- [ ] Middleware Express: rechazar peticiones que no vengan de `127.0.0.1`
-- [ ] Validar y sanitizar todos los inputs de la API
+- [x] Middleware Express: rechazar peticiones que no vengan de `127.0.0.1`
+- [x] Validar y sanitizar todos los inputs de la API
 - [x] `.env` en `.gitignore` (y también sesión WA y BD)
-- [ ] Logs sanitizados: nunca loggear passwords, tokens ni contenido de mensajes en producción
-- [ ] Manejo de errores global (Express error handler + proceso `uncaughtException`)
+- [x] Logs sanitizados: nunca loggear passwords, tokens ni contenido de mensajes en producción
+- [x] Manejo de errores global (Express error handler + proceso `uncaughtException`)
 
 ---
 
@@ -134,7 +134,7 @@
 - [ ] Tests unitarios para: scheduler, cola, email module, ACK watcher
 - [ ] Tests de integración para flujo completo (mock de whatsapp-web.js)
 - [ ] Recovery tras crash: al reiniciar, retomar mensajes en estado `sending` (marcar como `failed` y reencolar)
-- [ ] Logs estructurados con `pino` o `winston` (nivel configurable)
+- [-] Logs estructurados con `pino` o `winston` (nivel configurable)
 - [ ] Optimización RAM: modo headless Puppeteer, limitar concurrencia
 
 ---

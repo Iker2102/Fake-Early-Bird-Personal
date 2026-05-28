@@ -1,8 +1,16 @@
 import { Router } from "express";
+import type { Request, Response } from "express";
 
 import { getWhatsAppStatus } from "../whatsapp/client.js";
 import { sendManualMessage } from "../whatsapp/sender.js";
-import { createScheduledMessage, findScheduledMessages, } from "../db/repositories/scheduledMessageRepository.js";
+
+import {
+    createScheduledMessage,
+    deleteScheduledMessage,
+    findMessagesByPhone,
+    findScheduledMessages,
+    getMessageStatsForToday,
+} from "../db/repositories/scheduledMessageRepository.js";
 
 import {
     createContact,
@@ -11,45 +19,57 @@ import {
     findContacts,
     searchContacts,
     updateContact,
-} from "../db/repositories/contactRepository.js";import { findEmailLogs } from "../db/repositories/emailLogRepository.js"
+} from "../db/repositories/contactRepository.js";
 
-import { deleteScheduledMessage } from "../db/repositories/scheduledMessageRepository.js";
+import {
+    countSentEmailsToday,
+    findEmailLogs,
+} from "../db/repositories/emailLogRepository.js";
 
-import { getMessageStatsForToday } from "../db/repositories/scheduledMessageRepository.js";
-import { countSentEmailsToday } from "../db/repositories/emailLogRepository.js";
+import {
+    ValidationError,
+    validateMessage,
+    validateOptionalText,
+    validatePhone,
+    validatePriority,
+    validateRequiredText,
+    validateScheduledAt,
+} from "../utils/validators.js";
 
 import { streamLogs } from "./logStream.js";
 
-import type { Request } from "express";
-
-import { findMessagesByPhone } from "../db/repositories/scheduledMessageRepository.js";
-
-
 export const apiRouter = Router();
 
-/**
- * Envía un mensaje manual de prueba desde el dashboard/API
- *
- * Este endpoint es TEMPORAL y sirve para comprobar que WhatsApp Web
- * puede enviar mensajes correctamente antes de implementar el scheduler
- */
-apiRouter.post("/messages/test-send", async (req, res) => {
-    const { phone, message } = req.body ?? {};
-
-    if (!phone || !message) {
+function handleValidationError(error: unknown, res: Response): boolean {
+    if (error instanceof ValidationError) {
         res.status(400).json({
-            error: "phone y message son obligatorios",
+            error: error.message,
         });
-        return;
+
+        return true;
     }
 
+    return false;
+}
+
+/**
+ * Envía un mensaje manual de prueba desde el dashboard/API.
+ */
+apiRouter.post("/messages/test-send", async (req, res) => {
     try {
+        const phone = validatePhone(req.body.phone);
+        const message = validateMessage(req.body.message);
+
         await sendManualMessage(phone, message);
 
         res.json({
             status: "sent",
         });
     } catch (error) {
+        if (handleValidationError(error, res)) {
+            return;
+        }
+
         console.error("Error enviando mensaje:", error);
 
         res.status(500).json({
@@ -60,60 +80,47 @@ apiRouter.post("/messages/test-send", async (req, res) => {
 
 /**
  * Devuelve el estado actual del cliente de WhatsApp.
- *
- * También puede devolver el QR en formato Data URL cuando la sesión
- * todavía no está autenticada.
  */
 apiRouter.get("/whatsapp/status", (_req, res) => {
     res.json(getWhatsAppStatus());
 });
 
 /**
- * Crea un mensaje programado y lo guarda en la cola
+ * Crea un mensaje programado y lo guarda en la cola.
  */
 apiRouter.post("/messages", (req, res) => {
-    const { phone, contactName, message, scheduledAt } = req.body ?? {};
-
-    if (!phone || !message || !scheduledAt) {
-        res.status(400).json({
-            error: "phone, message y scheduledAt son obligatorios",
+    try {
+        const scheduledMessage = createScheduledMessage({
+            phone: validatePhone(req.body.phone),
+            contactName: validateOptionalText(req.body.contactName, "contactName", 100),
+            message: validateMessage(req.body.message),
+            scheduledAt: validateScheduledAt(req.body.scheduledAt),
         });
-        return;
+
+        res.status(201).json(scheduledMessage);
+    } catch (error) {
+        if (handleValidationError(error, res)) {
+            return;
+        }
+
+        res.status(500).json({
+            error: "No se pudo crear el mensaje programado",
+        });
     }
-
-    const scheduledMessage = createScheduledMessage({
-        phone,
-        contactName,
-        message,
-        scheduledAt,
-    });
-
-    res.status(201).json(scheduledMessage);
 });
 
 /**
- * Lista todos los mensajes programados
+ * Lista todos los mensajes programados.
  */
 apiRouter.get("/messages", (_req, res) => {
     res.json(findScheduledMessages());
 });
 
-
 /**
- * Lista los logs
- */
-apiRouter.get("/logs", (_req, res) => {
-    res.json(findEmailLogs());
-});
-
-
-
-/**
- * Elimina a partir de una id
+ * Elimina un mensaje programado por ID.
  */
 apiRouter.delete("/messages/:id", (req, res) => {
     deleteScheduledMessage(req.params.id);
-
 
     res.json({
         status: "deleted",
@@ -121,7 +128,14 @@ apiRouter.delete("/messages/:id", (req, res) => {
 });
 
 /**
- * Devuelve estadísticas generales del sistema para el dashboard
+ * Lista los logs de email.
+ */
+apiRouter.get("/logs", (_req, res) => {
+    res.json(findEmailLogs());
+});
+
+/**
+ * Devuelve estadísticas generales del sistema para el dashboard.
  */
 apiRouter.get("/stats", (_req, res) => {
     const now = new Date();
@@ -155,16 +169,14 @@ apiRouter.get("/stats", (_req, res) => {
 });
 
 /**
- * Stream SSE para enviar logs en tiempo real al dashboard
+ * Stream SSE para enviar logs en tiempo real al dashboard.
  */
 apiRouter.get("/logs/stream", (_req, res) => {
     streamLogs(res);
 });
 
-
 /**
- * Obtiene todos los contactos o filtra por búsqueda
- * Puede buscar por nombre, teléfono o etiquetas
+ * Obtiene todos los contactos o filtra por búsqueda.
  */
 apiRouter.get("/contacts", (req, res) => {
     const query = String(req.query.q ?? "").trim();
@@ -177,77 +189,10 @@ apiRouter.get("/contacts", (req, res) => {
     res.json(findContacts());
 });
 
-
 /**
- * Obtiene un contacto específico por ID
- */
-apiRouter.get("/contacts/:id", (req, res) => {
-    const contact = findContactById(req.params.id);
-
-    if (!contact) {
-        res.status(404).json({ error: "Contacto no encontrado" });
-        return;
-    }
-
-    res.json(contact);
-});
-
-/**
- * Crea un nuevo contacto
- * Controla errores de teléfono duplicado
- */
-apiRouter.post("/contacts", (req, res) => {
-    try {
-        const contact = createContact({
-            name: req.body.name,
-            phone: req.body.phone,
-            tags: req.body.tags ?? null,
-            priority: req.body.priority ?? "normal",
-        });
-
-        res.status(201).json(contact);
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-
-        if (message.includes("UNIQUE constraint failed: contacts.phone")) {
-            res.status(409).json({
-                error: "Ya existe un contacto con ese teléfono",
-            });
-
-            return;
-        }
-
-        res.status(500).json({
-            error: "No se pudo crear el contacto",
-        });
-    }
-});
-
-/**
- * Actualiza parcialmente un contacto existente
- */
-apiRouter.put("/contacts/:id", (req, res) => {
-    updateContact(req.params.id, {
-        name: req.body.name,
-        phone: req.body.phone,
-        tags: req.body.tags,
-        priority: req.body.priority,
-    });
-
-    res.json({ status: "updated" });
-});
-
-/**
- * Elimina un contacto por id
- */
-apiRouter.delete("/contacts/:id", (req, res) => {
-    deleteContact(req.params.id);
-
-    res.json({ status: "deleted" });
-});
-
-/**
- * Exporta los contactos filtrados en formato JSON
+ * Exporta los contactos filtrados en formato JSON.
+ *
+ * IMPORTANTE: esta ruta debe ir antes de /contacts/:id.
  */
 apiRouter.get("/contacts/export/json", (req, res) => {
     const contacts = getFilteredContacts(req);
@@ -262,7 +207,9 @@ apiRouter.get("/contacts/export/json", (req, res) => {
 });
 
 /**
- * Exporta los contactos filtrados en formato CSV
+ * Exporta los contactos filtrados en formato CSV.
+ *
+ * IMPORTANTE: esta ruta debe ir antes de /contacts/:id.
  */
 apiRouter.get("/contacts/export/csv", (req, res) => {
     const contacts = getFilteredContacts(req);
@@ -290,12 +237,114 @@ apiRouter.get("/contacts/export/csv", (req, res) => {
     res.send([header, ...rows].join("\n"));
 });
 
+/**
+ * Obtiene un contacto específico por ID.
+ */
+apiRouter.get("/contacts/:id", (req, res) => {
+    const contact = findContactById(req.params.id);
 
+    if (!contact) {
+        res.status(404).json({ error: "Contacto no encontrado" });
+        return;
+    }
+
+    res.json(contact);
+});
 
 /**
- * Obtiene contactos aplicando filtros opcionales
- * @param req 
- * @returns 
+ * Obtiene el historial de mensajes de un contacto.
+ */
+apiRouter.get("/contacts/:id/messages", (req, res) => {
+    const contact = findContactById(req.params.id);
+
+    if (!contact) {
+        res.status(404).json({ error: "Contacto no encontrado" });
+        return;
+    }
+
+    res.json(findMessagesByPhone(contact.phone));
+});
+
+/**
+ * Crea un nuevo contacto.
+ */
+apiRouter.post("/contacts", (req, res) => {
+    try {
+        const contact = createContact({
+            name: validateRequiredText(req.body.name, "name", 100),
+            phone: validatePhone(req.body.phone),
+            tags: validateOptionalText(req.body.tags, "tags", 300),
+            priority: validatePriority(req.body.priority),
+        });
+
+        res.status(201).json(contact);
+    } catch (error) {
+        if (handleValidationError(error, res)) {
+            return;
+        }
+
+        const message = error instanceof Error ? error.message : String(error);
+
+        if (message.includes("UNIQUE constraint failed: contacts.phone")) {
+            res.status(409).json({
+                error: "Ya existe un contacto con ese teléfono",
+            });
+
+            return;
+        }
+
+        res.status(500).json({
+            error: "No se pudo crear el contacto",
+        });
+    }
+});
+
+/**
+ * Actualiza parcialmente un contacto existente.
+ */
+apiRouter.put("/contacts/:id", (req, res) => {
+    try {
+        updateContact(req.params.id, {
+            name: req.body.name === undefined
+                ? undefined
+                : validateRequiredText(req.body.name, "name", 100),
+
+            phone: req.body.phone === undefined
+                ? undefined
+                : validatePhone(req.body.phone),
+
+            tags: req.body.tags === undefined
+                ? undefined
+                : validateOptionalText(req.body.tags, "tags", 300),
+
+            priority: req.body.priority === undefined
+                ? undefined
+                : validatePriority(req.body.priority),
+        });
+
+        res.json({ status: "updated" });
+    } catch (error) {
+        if (handleValidationError(error, res)) {
+            return;
+        }
+
+        res.status(500).json({
+            error: "No se pudo actualizar el contacto",
+        });
+    }
+});
+
+/**
+ * Elimina un contacto por ID.
+ */
+apiRouter.delete("/contacts/:id", (req, res) => {
+    deleteContact(req.params.id);
+
+    res.json({ status: "deleted" });
+});
+
+/**
+ * Obtiene contactos aplicando filtros opcionales.
  */
 function getFilteredContacts(req: Request) {
     const query = String(req.query.q ?? "").trim();
@@ -313,18 +362,3 @@ function getFilteredContacts(req: Request) {
 
     return contacts;
 }
-
-apiRouter.get("/contacts/:id/messages", (req, res) => {
-    const contact = findContactById(req.params.id);
-
-    if (!contact) {
-        res.status(404).json({ error: "Contacto no encontrado" });
-        return;
-    }
-
-    res.json(findMessagesByPhone(contact.phone));
-});
-
-
-
-
