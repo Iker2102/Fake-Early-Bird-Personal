@@ -16,6 +16,7 @@ let isProcessingQueue = false;
 import { canSendByCooldown, canSendByDailyLimit } from "./rules.js";
 
 import { startDeliveryTimeout } from "../whatsapp/deliveryTimeout.js";
+import { logInfo } from "../shared/logger.js";
 
 /**
  * Procesa la cola de mensajes pendientes
@@ -27,22 +28,22 @@ async function processScheduledMessages(): Promise<void> {
 
 
     if (!isClientReady()) {
-        console.log("Scheduler pausado: WhatsApp no está listo");
+        logInfo("Scheduler pausado: WhatsApp no está listo");
         return;
     }
 
     if (isProcessingQueue) {
-        console.log("La cola ya se está procesando");
+        logInfo("La cola ya se está procesando");
         return;
     }
 
     if (isWeekend(currentDate)) {
-        console.log("Scheduler pausado: fin de semana");
+        logInfo("Scheduler pausado: fin de semana");
         return;
     }
 
     if (!isWithinWorkHours(currentDate)) {
-        console.log("Scheduler pausado: fuera del horario laboral");
+        logInfo("Scheduler pausado: fuera del horario laboral");
         return;
     }
 
@@ -55,12 +56,12 @@ async function processScheduledMessages(): Promise<void> {
         for (const message of messages) {
 
             if (!canSendByCooldown(message)) {
-                console.log(`Mensaje ${message.id} pausado por cooldown`);
+                logInfo(`Mensaje ${message.id} pausado por cooldown`);
                 continue;
             }
 
             if (!canSendByDailyLimit(message)) {
-                console.log(`Mensaje ${message.id} pausado por límite diario`);
+                logInfo(`Mensaje ${message.id} pausado por límite diario`);
                 continue;
             }
 
@@ -77,7 +78,7 @@ async function processScheduledMessages(): Promise<void> {
                 const reason = error instanceof Error ? error.message : "Error desconocido";
 
                 if (reason === "WHATSAPP_NOT_READY") {
-                    console.log("WhatsApp no está listo, el mensaje seguirá en cola");
+                    logInfo("WhatsApp no está listo, el mensaje seguirá en cola");
                     continue;
                 }
 
@@ -97,5 +98,5 @@ export function startScheduler(): void {
         void processScheduledMessages();
     });
 
-    console.log("Scheduler iniciado");
+    logInfo("Scheduler iniciado");
 }

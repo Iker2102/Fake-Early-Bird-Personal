@@ -1,4 +1,5 @@
 import { env } from "../config/env.js";
+import { logInfo } from "../shared/logger.js";
 import { sleep, randomBetween } from "../shared/time.js";
 import { isClientReady, whatsappClient } from "./client.js";
 
@@ -23,7 +24,7 @@ export async function sendManualMessage(phone: string, message: string): Promise
         env.RANDOM_DELAY_MAX_SECONDS
     );
 
-    console.log(`Esperando ${delaySeconds}s antes de enviar a ${phone}`);
+    logInfo(`Esperando ${delaySeconds}s antes de enviar a ${phone}`);
 
     await sleep(delaySeconds * 1000);
 
@@ -40,7 +41,7 @@ export async function sendManualMessage(phone: string, message: string): Promise
 
     const sentMessage = await whatsappClient.sendMessage(chatId, message);
 
-    console.log(`Mensaje enviado a ${phone}`);
+    logInfo(`Mensaje enviado a ${phone}`);
 
     return sentMessage.id._serialized;
 }

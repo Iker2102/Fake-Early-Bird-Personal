@@ -4,6 +4,7 @@ import {
     markMessageAsDeliveryFailed,
 } from "../db/repositories/scheduledMessageRepository.js";
 import { sendDeliveryFailureEmail } from "../email/mailer.js";
+import { logWarn } from "../shared/logger.js";
 
 const activeDeliveryTimers = new Map<string, NodeJS.Timeout>();
 
@@ -24,7 +25,7 @@ export function startDeliveryTimeout(whatsappMessageId: string): void {
 
         activeDeliveryTimers.delete(whatsappMessageId);
 
-        console.warn(`Timeout de entrega para mensaje ${whatsappMessageId}`);
+        logWarn(`Timeout de entrega para mensaje ${whatsappMessageId}`);
 
         if (message) {
             sendDeliveryFailureEmail({

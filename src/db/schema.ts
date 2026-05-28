@@ -1,3 +1,4 @@
+import { logInfo } from "../shared/logger.js";
 import { database } from "./database.js";
 
 interface TableColumn {
@@ -33,9 +34,7 @@ function addColumnIfNotExists(
         `ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`
     );
 
-    console.log(
-        `Columna ${columnName} añadida correctamente a ${tableName}`
-    );
+    logInfo(`Columna ${columnName} añadida correctamente a ${tableName}`);
 }
 
 /**
@@ -138,5 +137,5 @@ export function initializeDatabase(): void {
 
 
 
-    console.log("Database schema initialized");
+    logInfo("Database schema initialized");
 }

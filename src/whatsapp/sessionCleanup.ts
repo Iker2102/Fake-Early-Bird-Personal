@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 
 import { env } from "../config/env.js";
+import { logWarn } from "../shared/logger.js";
 
 const CHROMIUM_LOCK_FILES = [
     "SingletonLock",
@@ -24,10 +25,10 @@ export function cleanupWhatsAppSessionLocks(): void {
                     force: true,
                 });
 
-                console.warn(`Lock antiguo eliminado: ${lockPath}`);
+                logWarn(`Lock antiguo eliminado: ${lockPath}`);
             }
         } catch (error) {
-            console.warn(`No se pudo eliminar lock ${lockPath}:`, error);
+            logWarn(`No se pudo eliminar lock ${lockPath}:`, error);
         }
     }
 }

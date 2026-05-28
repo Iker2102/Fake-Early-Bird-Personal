@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
-import { ValidationError } from "../utils/validators.js";
+import { ValidationError } from "../shared/validators.js";
+import { logError } from "../shared/logger.js";
 
 export function errorHandler(
     error: unknown,
@@ -15,7 +16,7 @@ export function errorHandler(
         return;
     }
 
-    console.error("Error no controlado:", error);
+    logError("Error no controlado:", error);
 
     res.status(500).json({
         error: "Error interno del servidor",

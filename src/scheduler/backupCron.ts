@@ -1,6 +1,7 @@
 import cron from "node-cron";
 
 import { createDatabaseBackup } from "../db/backup.js";
+import { logInfo } from "../shared/logger.js";
 
 
 
@@ -12,5 +13,5 @@ export function startBackupScheduler(): void {
         createDatabaseBackup();
     });
 
-    console.log("Backup diario programado");
+    logInfo("Backup diario programado");
 }

@@ -6,6 +6,7 @@ import { createEmailLog } from "../db/repositories/emailLogRepository.js";
 import { renderEmailTemplate } from "./templateRenderer.js";
 
 import { pushLog } from "../api/logStream.js";
+import { logError, logInfo, logWarn } from "../shared/logger.js";
 
 const transporter = nodemailer.createTransport({
     host: env.SMTP_HOST,
@@ -43,9 +44,9 @@ export async function verifyEmailTransport(): Promise<void> {
     try {
         await transporter.verify();
 
-        console.log("SMTP conectado correctamente");
+        logInfo("SMTP conectado correctamente");
     } catch {
-        console.warn("SMTP no disponible en entorno de desarrollo");
+        logWarn("SMTP no disponible en entorno de desarrollo");
     }
 }
 
@@ -72,9 +73,7 @@ class EmailQueue {
 
         this.queue.push(job);
 
-        console.log(
-            `[EmailQueue] Job encolado (id=${job.id}, total=${this.queue.length})`
-        );
+        logInfo(`[EmailQueue] Job encolado (id=${job.id}, total=${this.queue.length})`);
 
         pushLog("info", `Email encolado: ${subject}`);
 
@@ -94,7 +93,7 @@ class EmailQueue {
 
         this.isRunning = false;
 
-        console.log("[EmailQueue] Worker detenido");
+        logInfo("[EmailQueue] Worker detenido");
     }
 
     /**
@@ -103,7 +102,7 @@ class EmailQueue {
     private startWorker(): void {
         this.isRunning = true;
 
-        console.log("[EmailQueue] Worker arrancado");
+        logInfo("[EmailQueue] Worker arrancado");
 
         this.scheduleNextTick();
     }
@@ -125,7 +124,7 @@ class EmailQueue {
             this.isRunning = false;
             this.workerTimer = null;
 
-            console.log("[EmailQueue] Cola vacía, worker en espera");
+            logInfo("[EmailQueue] Cola vacía, worker en espera");
 
             return;
         }
@@ -148,9 +147,7 @@ class EmailQueue {
     private async processJob(job: EmailJob): Promise<void> {
         job.attempts++;
 
-        console.log(
-            `[EmailQueue] Enviando job id=${job.id} (intento ${job.attempts}/${MAX_ATTEMPTS})`
-        );
+        logInfo(`[EmailQueue] Enviando job id=${job.id} (intento ${job.attempts}/${MAX_ATTEMPTS})`);
 
         try {
             await transporter.sendMail({
@@ -162,14 +159,14 @@ class EmailQueue {
 
             createEmailLog(job.to, job.subject, "sent");
 
-            console.log(`[EmailQueue] Email enviado (id=${job.id})`);
+            logInfo(`[EmailQueue] Email enviado (id=${job.id})`);
 
             pushLog("info", `Email enviado: ${job.subject}`);
         } catch (error) {
             const message =
                 error instanceof Error ? error.message : "Error desconocido";
 
-            console.error(`[EmailQueue] Fallo al enviar id=${job.id}: ${message}`);
+            logError(`[EmailQueue] Fallo al enviar id=${job.id}: ${message}`);
             
             pushLog("error", `Error enviando email: ${message}`);
 
@@ -178,11 +175,7 @@ class EmailQueue {
                     RETRY_DELAYS_MS[job.attempts - 1] ??
                     RETRY_DELAYS_MS[RETRY_DELAYS_MS.length - 1];
 
-                console.log(
-                    `[EmailQueue] Reintento ${job.attempts + 1}/${MAX_ATTEMPTS} en ${
-                        retryDelayMs / 1000
-                    }s`
-                );
+                logInfo(`[EmailQueue] Reintento ${job.attempts + 1}/${MAX_ATTEMPTS} en ${retryDelayMs / 1000}s`);
 
                 setTimeout(() => {
                     this.queue.unshift(job);
@@ -197,9 +190,7 @@ class EmailQueue {
 
             createEmailLog(job.to, job.subject, "failed", message);
 
-            console.error(
-                `[EmailQueue] Job id=${job.id} descartado tras ${MAX_ATTEMPTS} intentos`
-            );
+            logError(`[EmailQueue] Job id=${job.id} descartado tras ${MAX_ATTEMPTS} intentos`);
         }
     }
 }

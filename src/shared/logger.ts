@@ -1,3 +1,13 @@
+const COLORS = {
+    reset: "\x1b[0m",
+
+    blue: "\x1b[34m",
+    yellow: "\x1b[33m",
+    red: "\x1b[31m",
+
+    gray: "\x1b[90m",
+};
+
 function sanitize(value: unknown): string {
     const text = String(value);
 
@@ -8,23 +18,33 @@ function sanitize(value: unknown): string {
         .replace(/"message"\s*:\s*".*?"/gi, '"message":"[HIDDEN]"');
 }
 
+function timestamp(): string {
+    return new Date().toISOString();
+}
+
 export function logInfo(message: string, ...args: unknown[]): void {
     console.log(
-        `[INFO] ${sanitize(message)}`,
+        `${COLORS.gray}[${timestamp()}]${COLORS.reset} ` +
+        `${COLORS.blue}[INFO]${COLORS.reset} ` +
+        `${sanitize(message)}`,
         ...args.map((arg) => sanitize(arg))
     );
 }
 
 export function logWarn(message: string, ...args: unknown[]): void {
     console.warn(
-        `[WARN] ${sanitize(message)}`,
+        `${COLORS.gray}[${timestamp()}]${COLORS.reset} ` +
+        `${COLORS.yellow}[WARN]${COLORS.reset} ` +
+        `${sanitize(message)}`,
         ...args.map((arg) => sanitize(arg))
     );
 }
 
 export function logError(message: string, ...args: unknown[]): void {
     console.error(
-        `[ERROR] ${sanitize(message)}`,
+        `${COLORS.gray}[${timestamp()}]${COLORS.reset} ` +
+        `${COLORS.red}[ERROR]${COLORS.reset} ` +
+        `${sanitize(message)}`,
         ...args.map((arg) => sanitize(arg))
     );
 }

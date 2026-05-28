@@ -16,7 +16,7 @@ import { startBackupScheduler } from "./scheduler/backupCron.js";
 import { localOnly } from "./api/localOnly.js";
 
 import { errorHandler } from "./api/errorHandler.js";
-import { logError } from "./utils/logger.js";
+import { logError, logInfo, logWarn } from "./shared/logger.js";
 
 const app = express();
 
@@ -39,7 +39,7 @@ await verifyEmailTransport();
 if (env.WA_ENABLED) {
     void initializeWhatsAppClient();
 } else {
-    console.log("WhatsApp desactivado por configuración");
+    logInfo("WhatsApp desactivado por configuración");
 }
 
 /**
@@ -78,7 +78,7 @@ app.use(express.static(path.join(__dirname, "dashboard", "public")));
  * Cierra recursos externos antes de apagar la aplicación manualmente
  */
 process.on("SIGINT", async () => {
-    console.log("Cerrando aplicación...");
+    logInfo("Cerrando aplicación...");
 
     await destroyWhatsAppClient();
 
@@ -89,7 +89,7 @@ process.on("SIGINT", async () => {
  * Cierra recursos externos cuando el sistema solicita finalizar el proceso
  */
 process.on("SIGTERM", async () => {
-    console.log("Cerrando aplicación...");
+    logInfo("Cerrando aplicación...");
 
     await destroyWhatsAppClient();
 
@@ -109,11 +109,11 @@ process.on("unhandledRejection", (reason) => {
         message.includes("Target closed") ||
         message.includes("Protocol error")
     ) {
-        console.warn("WhatsApp Web cerró o recargó el navegador interno.");
+        logWarn("WhatsApp Web cerró o recargó el navegador interno.");
         return;
     }
 
-    console.error("Unhandled rejection:", reason);
+    logError("Unhandled rejection:", reason);
 });
 
 /**
@@ -124,7 +124,7 @@ process.on("uncaughtException", (error) => {
 });
 
 process.on("unhandledRejection", (reason) => {
-    console.error("Unhandled rejection:", reason);
+    logError("Unhandled rejection:", reason);
 });
 
 /**
@@ -140,7 +140,7 @@ app.get("/health", (_req, res) => {
  * Inicia el servidor Express en el puerto configurado
  */
 app.listen(env.PORT, () => {
-    console.log(`Fake Early Bird running on port ${env.PORT}`);
+    logInfo(`Fake Early Bird running on port ${env.PORT}`);
 });
 
 
@@ -151,7 +151,7 @@ async function shutdown(): Promise<void> {
 
     isShuttingDown = true;
 
-    console.log("Cerrando aplicación...");
+    logInfo("Cerrando aplicación...");
 
     await destroyWhatsAppClient();
 

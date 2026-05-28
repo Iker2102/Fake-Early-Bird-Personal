@@ -34,7 +34,7 @@ import {
     validatePriority,
     validateRequiredText,
     validateScheduledAt,
-} from "../utils/validators.js";
+} from "../shared/validators.js";
 
 import { streamLogs } from "./logStream.js";
 

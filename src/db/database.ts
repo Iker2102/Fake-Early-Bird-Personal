@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 
 import { env } from "../config/env.js";
+import { logInfo } from "../shared/logger.js";
 
 /**
  * Conexión principal SQLite, la conexión se reutiliza en toda la aplicación
@@ -12,4 +13,4 @@ export const database = new Database(env.DB_PATH);
  */
 database.pragma("journal_mode = WAL");
 
-console.log("SQLite connected");
+logInfo("SMTP no disponible en entorno de desarrollo");

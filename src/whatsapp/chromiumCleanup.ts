@@ -1,6 +1,7 @@
 import fs from "fs";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { logWarn } from "../shared/logger.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -46,15 +47,12 @@ export async function killOrphanChromiumProcesses(): Promise<void> {
             try {
                 process.kill(Number(pid), "SIGKILL");
 
-                console.warn(`Proceso Chromium eliminado (PID=${pid})`);
+                logWarn(`Proceso Chromium eliminado (PID=${pid})`);
             } catch {
                 // El proceso pudo morir antes
             }
         }
     } catch (error) {
-        console.warn(
-            "No se pudieron limpiar procesos Chromium:",
-            error
-        );
+        logWarn("No se pudieron limpiar procesos Chromium:", error);
     }
 }

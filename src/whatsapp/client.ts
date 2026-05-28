@@ -17,6 +17,7 @@ import { registerAckWatcher, resetAckWatcher } from "./ackWatcher.js";
 import { cleanupWhatsAppSessionLocks } from "./sessionCleanup.js";
 
 import { killOrphanChromiumProcesses } from "./chromiumCleanup.js";
+import { logError, logInfo, logWarn } from "../shared/logger.js";
 
 
 let isWhatsAppReady = false;
@@ -53,7 +54,7 @@ let reconnectTimeout: NodeJS.Timeout | null = null;
  */
 export async function initializeWhatsAppClient(): Promise<void> {
     if (whatsappClient || isInitializing) {
-        console.log("WhatsApp ya está inicializado o inicializándose");
+        logInfo("WhatsApp ya está inicializado o inicializándose");
         return;
     }
 
@@ -89,7 +90,7 @@ registerAckWatcher(whatsappClient);
 whatsappClient.on("qr", async (qr) => {
     whatsappStatus = "qr";
 
-    console.log("Escanea este QR con WhatsApp:");
+    logInfo("Escanea este QR con WhatsApp:");
 
     qrcode.generate(qr, {
         small: true,
@@ -105,7 +106,7 @@ whatsappClient.on("authenticated", () => {
     whatsappStatus = "authenticated";
     currentQr = null;
 
-    console.log("WhatsApp autenticado correctamente");
+    logInfo("WhatsApp autenticado correctamente");
 });
 
 /**
@@ -121,7 +122,7 @@ whatsappClient.on("ready", () => {
     reconnectAttempts = 0;
     isWhatsAppReady = true;
 
-    console.log("WhatsApp conectado y listo");
+    logInfo("WhatsApp conectado y listo");
 });
 
 /**
@@ -137,7 +138,7 @@ whatsappClient.on("auth_failure", async (message) => {
         sendDisconnectAlertEmail(`auth_failure: ${message}`, pendingMessages);
     }
 
-    console.error("Error de autenticación:", message);
+    logError("Error de autenticación:", message);
 
 
     scheduleReconnect();
@@ -157,7 +158,7 @@ whatsappClient.on("disconnected", async (reason) => {
         sendDisconnectAlertEmail(reason, pendingMessages);
     }
 
-    console.warn("WhatsApp desconectado:", reason);
+    logWarn("WhatsApp desconectado:", reason);
 
     await destroyWhatsAppClient();
     scheduleReconnect();   
@@ -173,7 +174,7 @@ try {
     whatsappStatus = "error";
     isWhatsAppReady = false;
 
-    console.error("Error inicializando WhatsApp:", error);
+    logError("Error inicializando WhatsApp:", error);
 
     /**
      * Error de permisos en Linux/macOS
@@ -182,9 +183,7 @@ try {
         whatsappClient = null;
         isInitializing = false;
 
-        console.error(
-            "Error de permisos en la sesión de WhatsApp. Revisa .wwebjs_auth."
-        );
+        logError("Error de permisos en la sesión de WhatsApp. Revisa .wwebjs_auth.");
 
         return;
     }
@@ -200,9 +199,7 @@ try {
         errorMessage.includes("Code: 71");
 
     if (isProfileLockedError) {
-        console.warn(
-            "Perfil Chromium bloqueado. Limpiando procesos y locks..."
-        );
+        logWarn("Perfil Chromium bloqueado. Limpiando procesos y locks...");
 
         await killOrphanChromiumProcesses();
 
@@ -234,7 +231,7 @@ function scheduleReconnect(): void {
     }
 
     if (reconnectAttempts >= env.WA_RECONNECT_MAX_ATTEMPTS) {
-        console.error("Número máximo de intentos de reconexión alcanzado");
+        logError("Número máximo de intentos de reconexión alcanzado");
         return;
     }
 
@@ -243,7 +240,7 @@ function scheduleReconnect(): void {
     const delayMs =
         env.WA_RECONNECT_BASE_DELAY_SECONDS * 1000 * Math.pow(2, reconnectAttempts - 1);
 
-    console.log(`Reintentando conexión de WhatsApp en ${delayMs / 1000} segundos...`);
+    logInfo(`Reintentando conexión de WhatsApp en ${delayMs / 1000} segundos...`);
 
     reconnectTimeout = setTimeout(async () => {
         reconnectTimeout = null;
@@ -251,7 +248,7 @@ function scheduleReconnect(): void {
         try {
             await initializeWhatsAppClient();
         } catch (error) {
-            console.error("Error durante la reconexión de WhatsApp:", error);
+            logError("Error durante la reconexión de WhatsApp:", error);
             scheduleReconnect();
         }
     }, delayMs);
@@ -274,7 +271,7 @@ export async function destroyWhatsAppClient(): Promise<void> {
             new Promise((resolve) => setTimeout(resolve, 10000))
         ]);
     } catch (error) {
-        console.error("Error cerrando cliente de WhatsApp:", error);
+        logError("Error cerrando cliente de WhatsApp:", error);
     } finally {
         whatsappClient = null;
         isInitializing = false;

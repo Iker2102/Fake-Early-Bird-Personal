@@ -3,6 +3,7 @@ import { env } from "../config/env.js";
 import fs from "fs";
 
 import path from "path";
+import { logInfo, logWarn } from "../shared/logger.js";
 
 
 /**
@@ -11,7 +12,7 @@ import path from "path";
  */
 export function createDatabaseBackup(): void {
     if(!fs.existsSync(env.DB_PATH)) {
-        console.warn("No se ha podido crear backup: La base de datos no existe");
+        logWarn("No se ha podido crear backup: La base de datos no existe");
         return;
     }
 
@@ -28,5 +29,5 @@ export function createDatabaseBackup(): void {
 
     fs.copyFileSync(env.DB_PATH, backupPath);
 
-    console.log(`Backup creado: ${backupPath}`);
+    logInfo(`Backup creado: ${backupPath}`);
 }

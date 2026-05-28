@@ -9,6 +9,7 @@ import {
     sendDeliverySuccessEmail,
     sendRetryExhaustedEmail,
 } from "../email/mailer.js";
+import { logError, logInfo, logWarn } from "../shared/logger.js";
 
 import { ACK_LEVELS, getAckLabel } from "./ackLevels.js";
 import { clearDeliveryTimeout } from "./deliveryTimeout.js";
@@ -32,9 +33,7 @@ export function registerAckWatcher(client: any): void {
             return;
         }
 
-        console.log(
-            `ACK recibido: ${whatsappMessageId} -> ${ack} (${getAckLabel(ack)})`
-        );
+        logInfo(`ACK recibido: ${whatsappMessageId} -> ${ack} (${getAckLabel(ack)})`);
 
         if (ack < ACK_LEVELS.PENDING) {
             const reason = `ack_error_${ack}`;
@@ -45,11 +44,11 @@ export function registerAckWatcher(client: any): void {
             const failedMessage = findMessageByWhatsappId(whatsappMessageId);
 
             if (failedMessage && failedMessage.retryCount < env.RETRY_MAX) {
-                console.warn(`ACK fallido. Reintentando mensaje ${failedMessage.id}`);
+                logWarn(`ACK fallido. Reintentando mensaje ${failedMessage.id}`);
 
                 requeueMessageByWhatsappId(whatsappMessageId);
             } else {
-                console.error(`ACK fallido definitivo para ${whatsappMessageId}`);
+                logError(`ACK fallido definitivo para ${whatsappMessageId}`);
 
                 if (failedMessage) {
                     sendRetryExhaustedEmail({
