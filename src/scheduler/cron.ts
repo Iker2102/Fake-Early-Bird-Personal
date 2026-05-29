@@ -22,7 +22,7 @@ import { logInfo } from "../shared/logger.js";
  * Procesa la cola de mensajes pendientes
  * @returns 
  */
-async function processScheduledMessages(): Promise<void> {
+export async function processScheduledMessages(): Promise<void> {
 
     const currentDate = getCurrentDateInTimezone();
 

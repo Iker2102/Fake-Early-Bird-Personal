@@ -2,6 +2,7 @@ import { env } from "../config/env.js";
 import { logInfo } from "../shared/logger.js";
 import { sleep, randomBetween } from "../shared/time.js";
 import { isClientReady, whatsappClient } from "./client.js";
+import { whatsappSendLock } from "./sendLock.js";
 
 /**
  * Envía un mensaje manual de WhatsApp a un número concreto
@@ -12,36 +13,40 @@ import { isClientReady, whatsappClient } from "./client.js";
  * @param message 
  */
 export async function sendManualMessage(phone: string, message: string): Promise<string> {
-    if (!isClientReady() || !whatsappClient) {
-        throw new Error("WHATSAPP_NOT_READY");
-    }
 
-    const cleanPhone = phone.replace("+", "").replace(/\s/g, "");
-    const chatId = `${cleanPhone}@c.us`;
+    return whatsappSendLock.runExclusive(async () => {
+        if (!isClientReady() || !whatsappClient) {
+            throw new Error("WHATSAPP_NOT_READY");
+        }
 
-    const delaySeconds = randomBetween(
-        env.RANDOM_DELAY_MIN_SECONDS,
-        env.RANDOM_DELAY_MAX_SECONDS
-    );
+        const cleanPhone = phone.replace("+", "").replace(/\s/g, "");
+        const chatId = `${cleanPhone}@c.us`;
 
-    logInfo(`Esperando ${delaySeconds}s antes de enviar a ${phone}`);
+        const delaySeconds = randomBetween(
+            env.RANDOM_DELAY_MIN_SECONDS,
+            env.RANDOM_DELAY_MAX_SECONDS
+        );
 
-    await sleep(delaySeconds * 1000);
+        logInfo(`Esperando ${delaySeconds}s antes de enviar mensaje`);
 
-    const typingDelay =
-        env.TYPING_BASE_DELAY_MS + message.length * env.TYPING_MS_PER_CHAR;
+        await sleep(delaySeconds * 1000);
 
-    const chat = await whatsappClient.getChatById(chatId);
+        const typingDelay =
+            env.TYPING_BASE_DELAY_MS + message.length * env.TYPING_MS_PER_CHAR;
 
-    await chat.sendStateTyping();
+        const chat = await whatsappClient.getChatById(chatId);
 
-    await sleep(typingDelay);
+        await chat.sendStateTyping();
 
-    await chat.clearState();
+        await sleep(typingDelay);
 
-    const sentMessage = await whatsappClient.sendMessage(chatId, message);
+        await chat.clearState();
 
-    logInfo(`Mensaje enviado a ${phone}`);
+        const sentMessage = await whatsappClient.sendMessage(chatId, message);
 
-    return sentMessage.id._serialized;
+        logInfo(`Mensaje enviado correctamente`);
+
+        return sentMessage.id._serialized;
+
+    });
 }

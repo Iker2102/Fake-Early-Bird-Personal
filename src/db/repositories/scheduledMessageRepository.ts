@@ -429,3 +429,24 @@ export function findMessagesByPhone(phone: string): ScheduledMessage[] {
         )
         .all(phone) as ScheduledMessage[];
 }
+
+
+/**
+ * Recupera mensajes que quedaron en estado sending tras un cierre inesperado
+ * @returns 
+ */
+export function recoverSendingMessagesAfterCrash(): number {
+    const result = database
+        .prepare(
+            `
+            UPDATE scheduled_messages
+            SET status = 'scheduled',
+                failReason = 'crash_recovery',
+                retryCount = retryCount + 1
+            WHERE status = 'sending'
+            `
+        )
+        .run();
+
+    return result.changes;
+}

@@ -18,6 +18,9 @@ import { localOnly } from "./api/localOnly.js";
 import { errorHandler } from "./api/errorHandler.js";
 import { logError, logInfo, logWarn } from "./shared/logger.js";
 
+import { recoverSendingMessagesAfterCrash } from "./db/repositories/scheduledMessageRepository.js";
+
+
 const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +32,14 @@ let isShuttingDown = false;
  * Inicializa la base de datos SQLite y crea las tablas necesarias
  */
 initializeDatabase();
+
+
+const recoveredMessages = recoverSendingMessagesAfterCrash();
+
+if(recoveredMessages > 0) {
+    logWarn(`Mensajes recuperados tras crash: ${recoveredMessages}`);
+}
+
 
 await verifyEmailTransport();
 

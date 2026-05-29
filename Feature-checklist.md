@@ -131,11 +131,11 @@
 
 ## Fase 11 - Calidad y Resiliencia
 
-- [ ] Tests unitarios para: scheduler, cola, email module, ACK watcher
+- [x] Tests unitarios para: scheduler, cola, email module, ACK watcher
 - [ ] Tests de integración para flujo completo (mock de whatsapp-web.js)
-- [ ] Recovery tras crash: al reiniciar, retomar mensajes en estado `sending` (marcar como `failed` y reencolar)
+- [x] Recovery tras crash: al reiniciar, retomar mensajes en estado `sending` (marcar como `failed` y reencolar)
 - [-] Logs estructurados con `pino` o `winston` (nivel configurable)
-- [ ] Optimización RAM: modo headless Puppeteer, limitar concurrencia
+- [x] Optimización RAM: modo headless Puppeteer, limitar concurrencia
 
 ---
 
