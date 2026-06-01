@@ -134,7 +134,7 @@
 - [x] Tests unitarios para: scheduler, cola, email module, ACK watcher
 - [ ] Tests de integración para flujo completo (mock de whatsapp-web.js)
 - [x] Recovery tras crash: al reiniciar, retomar mensajes en estado `sending` (marcar como `failed` y reencolar)
-- [-] Logs estructurados con `pino` o `winston` (nivel configurable)
+- [x] Logs estructurados con `pino` o `winston` (nivel configurable)
 - [x] Optimización RAM: modo headless Puppeteer, limitar concurrencia
 
 ---

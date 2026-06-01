@@ -1,12 +1,21 @@
-const COLORS = {
-    reset: "\x1b[0m",
+import pino from "pino";
 
-    blue: "\x1b[34m",
-    yellow: "\x1b[33m",
-    red: "\x1b[31m",
+import { env } from "../config/env.js";
 
-    gray: "\x1b[90m",
-};
+const pinoLogger = pino({
+    level: env.LOG_LEVEL ?? "info",
+
+    transport:
+        process.env.NODE_ENV !== "production"
+            ? {
+                  target: "pino-pretty",
+                  options: {
+                      colorize: true,
+                      translateTime: true,
+                  },
+              }
+            : undefined,
+});
 
 function sanitize(value: unknown): string {
     const text = String(value);
@@ -18,33 +27,22 @@ function sanitize(value: unknown): string {
         .replace(/"message"\s*:\s*".*?"/gi, '"message":"[HIDDEN]"');
 }
 
-function timestamp(): string {
-    return new Date().toISOString();
-}
-
 export function logInfo(message: string, ...args: unknown[]): void {
-    console.log(
-        `${COLORS.gray}[${timestamp()}]${COLORS.reset} ` +
-        `${COLORS.blue}[INFO]${COLORS.reset} ` +
-        `${sanitize(message)}`,
-        ...args.map((arg) => sanitize(arg))
+    pinoLogger.info(
+        [message, ...args.map((arg) => sanitize(arg))].join(" ")
     );
 }
 
 export function logWarn(message: string, ...args: unknown[]): void {
-    console.warn(
-        `${COLORS.gray}[${timestamp()}]${COLORS.reset} ` +
-        `${COLORS.yellow}[WARN]${COLORS.reset} ` +
-        `${sanitize(message)}`,
-        ...args.map((arg) => sanitize(arg))
+    pinoLogger.warn(
+        [message, ...args.map((arg) => sanitize(arg))].join(" ")
     );
 }
 
 export function logError(message: string, ...args: unknown[]): void {
-    console.error(
-        `${COLORS.gray}[${timestamp()}]${COLORS.reset} ` +
-        `${COLORS.red}[ERROR]${COLORS.reset} ` +
-        `${sanitize(message)}`,
-        ...args.map((arg) => sanitize(arg))
+    pinoLogger.error(
+        [message, ...args.map((arg) => sanitize(arg))].join(" ")
     );
 }
+
+export { pinoLogger as logger };

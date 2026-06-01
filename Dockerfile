@@ -20,7 +20,14 @@ RUN mkdir -p /app/.wwebjs_auth /app/.wwebjs_cache /app/data \
 
 USER pptruser
 
-RUN npx puppeteer browsers install chrome
+RUN rm -rf /home/pptruser/.cache/puppeteer/chrome/linux-146.0.7680.31 \
+    && npx puppeteer browsers install chrome@stable \
+    && CHROME_PATH=$(find /home/pptruser/.cache/puppeteer -name chrome -type f | head -n 1) \
+    && mkdir -p /home/pptruser/.local/bin \
+    && ln -sf "$CHROME_PATH" /home/pptruser/.local/bin/chrome
+
+RUN rm -rf /home/pptruser/.cache/puppeteer/chrome/linux-146.0.7680.31 \
+    && npx puppeteer browsers install chrome
 
 EXPOSE 3000
 

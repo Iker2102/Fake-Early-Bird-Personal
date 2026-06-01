@@ -9,6 +9,7 @@ services:
       - .env
     environment:
       - RUNNING_IN_DOCKER=true
+      - PUPPETEER_EXECUTABLE_PATH=/home/pptruser/.local/bin/chrome
     volumes:
       - .:/app
       - /app/node_modules

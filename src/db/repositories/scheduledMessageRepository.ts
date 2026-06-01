@@ -22,6 +22,9 @@ export type ScheduledMessage = {
     createdAt: string;
     sentAt: string | null;
     deliveredAt: string | null;
+
+    whatsappMessageId: string | null;
+
     ackLevel: number | null;
     retryCount: number;
     notifiedAt: string | null;
@@ -56,6 +59,10 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
         createdAt: now,
         sentAt: null,
         deliveredAt: null,
+
+        whatsappMessageId: null,
+
+
         ackLevel: null,
         retryCount: 0,
         notifiedAt: null,

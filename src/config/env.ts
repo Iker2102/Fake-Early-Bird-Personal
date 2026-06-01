@@ -86,6 +86,8 @@ export const env = {
     RETRY_MAX: getNumberEnv("RETRY_MAX", 3),
 
     NOTIFY_ON_SUCCESS: getBooleanEnv("NOTIFY_ON_SUCCESS", false),
+
+    LOG_LEVEL: getLogLevelEnv(),
 };
 
 
@@ -107,4 +109,42 @@ function getBooleanEnv(name: string, defaultValue?: boolean): boolean {
     }
 
     return rawValue === "true";
+}
+
+/**
+ * Obtiene una variable de entorno de tipo String
+ * @param name 
+ * @param defaultValue 
+ * @returns 
+ */
+function getStringEnv(name: string, defaultValue?: string): string {
+    const value = process.env[name];
+
+    if (!value && defaultValue !== undefined) {
+        return defaultValue;
+    }
+
+    if (!value) {
+        throw new Error(`Falta la variable de entorno requerida: ${name}`);
+    }
+
+    return value;
+}
+
+/**
+ * Filtra para los valores permitidos del LOG_LEVELw
+ * @returns 
+ */
+function getLogLevelEnv(): string {
+    const value = process.env.LOG_LEVEL ?? "info";
+
+    const allowed = ["trace", "debug", "info", "warn", "error", "fatal"];
+
+    if (!allowed.includes(value)) {
+        throw new Error(
+            `LOG_LEVEL inválido. Valores permitidos: ${allowed.join(", ")}`
+        );
+    }
+
+    return value;
 }

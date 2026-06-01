@@ -64,6 +64,8 @@ http://localhost:3000
 
 # Desarrollo con Docker
 
+El contenedor instala automáticamente Google Chrome para Puppeteer durante la construcción de la imagen, por lo que no es necesario instalar navegadores manualmente en el host
+
 ## Ejecutar entorno de desarrollo
 
 ```bash
