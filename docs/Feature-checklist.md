@@ -142,11 +142,11 @@
 ## Fase 12 - Deployment
 
 - [x] Configuración PM2 (`ecosystem.config.js`) con restart automático
-- [ ] Script `install.sh` (instala deps, crea `.env` de ejemplo, inicia PM2)
+- [x] Script `install.sh` (instala deps, crea `.env` de ejemplo, inicia PM2)
 - [x] Dockerfile opcional (Node + Chromium para Puppeteer)
 - [x] `docker-compose.yml` opcional con volúmenes para sesión y BD
 - [x] `README.md` con guía de instalación y primer QR scan
-- [ ] Configuración de inicio al arrancar sistema (systemd / Windows Task Scheduler)
+- [x] Configuración de inicio al arrancar sistema (systemd / Windows Task Scheduler)
 
 ---
 

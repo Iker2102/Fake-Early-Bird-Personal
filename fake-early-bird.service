@@ -1,0 +1,14 @@
+[Unit]
+Description=Fake Early Bird
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/fake-early-bird
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target
