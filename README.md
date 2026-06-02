@@ -19,6 +19,9 @@ El objetivo del proyecto es ofrecer una herramienta sencilla para automatizar en
 - QRCode
 - HTML/CSS/JavaScript
 - Docker
+- Vitest
+- PM2
+- Pino
 
 ---
 
@@ -97,10 +100,58 @@ docker compose -f docker-compose.dev.yml down
 | npm run dev | Ejecuta el proyecto en desarrollo |
 | npm run build | Compila TypeScript |
 | npm run start | Ejecuta versión compilada |
+| npm run test | Ejecuta los tests con Vitest |
 | npm run lint | Ejecuta ESLint |
 | npm run format | Formatea el código |
 
 ---
+
+# Ejecución con PM2
+
+Compilar el proyecto:
+
+```bash
+npm run build
+```
+
+Iniciar con PM2:
+
+```bash
+npx pm2 start ecosystem.config.cjs
+```
+
+Ver estado:
+
+```bash
+npx pm2 list
+```
+
+Ver logs:
+
+```bash
+npx pm2 logs fake-early-bird
+```
+
+Reiniciar:
+
+```bash
+npx pm2 restart fake-early-bird
+```
+
+Detener:
+
+```bash
+npx pm2 stop fake-early-bird
+```
+
+Eliminar del gestor:
+
+```bash
+npx pm2 delete fake-early-bird
+```
+
+---
+
 
 # Dashboard
 
@@ -127,6 +178,8 @@ El sistema de contactos incluye:
 - Etiquetas personalizadas
 - Exportación a CSV
 - Exportación a JSON
+- Historial de mensajes por contacto
+- Importación desde CSV
 
 ---
 
@@ -222,6 +275,15 @@ GET /api/contacts/export/json
 
 ```http
 GET /api/logs/stream
+```
+
+## Obtener historial de un contacto
+
+```http
+GET /api/contacts/:id/messages
+```
+
+Devuelve todos los mensajes asociados al número de teléfono del contacto.
 ```
 
 ---
@@ -321,5 +383,30 @@ GET /api/logs/stream
 - [x] Búsqueda por nombre o número
 - [x] Sistema de favoritos y etiquetas
 - [x] Exportación a CSV/JSON
-- [ ] Historial de mensajes por contacto
-- [ ] Importación desde CSV
+- [x] Historial de mensajes por contacto
+- [x] Importación desde CSV
+
+## Fase 10 - Seguridad
+
+- [x] Middleware Express: rechazar peticiones que no vengan de `127.0.0.1`
+- [x] Validar y sanitizar todos los inputs de la API
+- [x] `.env` en `.gitignore` (y también sesión WA y BD)
+- [x] Logs sanitizados: nunca loggear passwords, tokens ni contenido de mensajes en producción
+- [x] Manejo de errores global (Express error handler + proceso `uncaughtException`)
+
+## Fase 11 - Calidad y Resiliencia
+
+- [x] Tests unitarios para: scheduler, cola, email module, ACK watcher
+- [x] Tests de integración para flujo completo (mock de whatsapp-web.js)
+- [x] Recovery tras crash: al reiniciar, retomar mensajes en estado `sending`
+- [x] Logs estructurados con `pino`
+- [x] Optimización RAM: modo headless Puppeteer y limitación de concurrencia
+
+## Fase 12 - Deployment
+
+- [x] Configuración PM2 (`ecosystem.config.cjs`) con restart automático
+- [ ] Script `install.sh` (instala deps, crea `.env` de ejemplo, inicia PM2)
+- [x] Dockerfile opcional (Node + Chromium para Puppeteer)
+- [x] `docker-compose.yml` opcional con volúmenes para sesión y BD
+- [x] `README.md` con guía de instalación y primer QR scan
+- [ ] Configuración de inicio al arrancar sistema (systemd / Windows Task Scheduler)

@@ -132,7 +132,7 @@
 ## Fase 11 - Calidad y Resiliencia
 
 - [x] Tests unitarios para: scheduler, cola, email module, ACK watcher
-- [ ] Tests de integración para flujo completo (mock de whatsapp-web.js)
+- [x] Tests de integración para flujo completo (mock de whatsapp-web.js)
 - [x] Recovery tras crash: al reiniciar, retomar mensajes en estado `sending` (marcar como `failed` y reencolar)
 - [x] Logs estructurados con `pino` o `winston` (nivel configurable)
 - [x] Optimización RAM: modo headless Puppeteer, limitar concurrencia
@@ -141,7 +141,7 @@
 
 ## Fase 12 - Deployment
 
-- [ ] Configuración PM2 (`ecosystem.config.js`) con restart automático
+- [x] Configuración PM2 (`ecosystem.config.js`) con restart automático
 - [ ] Script `install.sh` (instala deps, crea `.env` de ejemplo, inicia PM2)
 - [x] Dockerfile opcional (Node + Chromium para Puppeteer)
 - [x] `docker-compose.yml` opcional con volúmenes para sesión y BD
