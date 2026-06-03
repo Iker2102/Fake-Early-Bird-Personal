@@ -37,6 +37,7 @@ import {
 } from "../shared/validators.js";
 
 import { streamLogs } from "./logStream.js";
+import { logWarn } from "../shared/logger.js";
 
 export const apiRouter = Router();
 
@@ -362,3 +363,84 @@ function getFilteredContacts(req: Request) {
 
     return contacts;
 }
+
+/**
+ * Exporta todo a formato JSON
+ */
+apiRouter.get("/export/full", (_req, res) => {
+    const data = {
+        exportedAt: new Date().toISOString(),
+        version: "1.0",
+        contacts: findContacts(),
+        messages: findScheduledMessages(),
+        emailLogs: findEmailLogs(),
+    };
+
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=fake-early-bird-export.json"
+    );
+
+    res.send(JSON.stringify(data, null, 2));
+});
+
+
+/**
+ * Imorta todo el contenido
+ */
+apiRouter.post("/import/full", (req, res) => {
+    const data = req.body;
+
+    if (!data || data.version !== "1.0") {
+        res.status(400).json({
+            error: "Archivo de importación no válido",
+        });
+        return;
+    }
+
+    let contactsImported = 0;
+    let messagesImported = 0;
+
+    for (const contact of data.contacts ?? []) {
+        try {
+            createContact({
+                name: contact.name,
+                phone: contact.phone,
+                tags: contact.tags ?? null,
+                priority: contact.priority ?? "normal",
+            });
+
+            contactsImported++;
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+
+            if (!message.includes("UNIQUE")) {
+             throw error;
+            }
+        }
+    }
+
+    for (const contact of data.contacts ?? []) {
+        try {
+            createContact({
+                name: contact.name,
+                phone: contact.phone,
+                tags: contact.tags ?? null,
+                priority: contact.priority ?? "normal",
+            });
+
+            contactsImported++;
+        } catch (error) {
+            logWarn(`Contacto omitido durante importación: ${contact.phone}`);
+        }
+    }
+
+    res.json({
+        status: "imported",
+        contactsImported,
+        messagesImported,
+    });
+});
+
+

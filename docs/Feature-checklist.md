@@ -153,7 +153,7 @@
 ## Fase 13 - Extras y Pulido
 
 - [ ] Mensajes recurrentes (diario, semanal, mensual, custom cron)
-- [ ] Exportación completa a JSON (mensajes + contactos + logs)
+- [x] Exportación completa a JSON (mensajes + contactos + logs)
 - [ ] Importación JSON para restaurar estado
 - [ ] Resumen diario por email (hora configurable)
 - [ ] Página de configuración en dashboard (editar `.env` vía UI)

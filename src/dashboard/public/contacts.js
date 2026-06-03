@@ -13,6 +13,10 @@ const contactHistoryTable = document.getElementById("contact-history-table");
 
 const importCsvInput = document.getElementById("import-csv-input");
 
+const exportFullButton = document.getElementById("export-full-button");
+
+const importJsonInput = document.getElementById("import-json-input");
+
 
 function parseCsv(text) {
     const lines = text
@@ -361,4 +365,42 @@ importCsvInput.addEventListener("change", async () => {
     }
 
     await importContactsFromCsv(file);
+});
+
+exportFullButton.addEventListener("click", () => {
+    window.location.href = "/api/export/full";
+});
+
+importJsonInput.addEventListener("change", async () => {
+    const file = importJsonInput.files?.[0];
+
+    if (!file) {
+        return;
+    }
+
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    const response = await fetch("/api/import/full", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        alert(result.error ?? "No se pudo importar el JSON");
+        return;
+    }
+
+    alert(
+        `Importación completada: ${result.contactsImported} contactos y ${result.messagesImported} mensajes`
+    );
+
+    importJsonInput.value = "";
+
+    await loadContacts(searchInput.value.trim());
 });
