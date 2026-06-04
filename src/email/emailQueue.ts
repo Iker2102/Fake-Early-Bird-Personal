@@ -5,6 +5,7 @@ export interface EmailJob {
     to: string;
     subject: string;
     html: string;
+    type: string;
     attempts: number;
     createdAt: Date;
 }
@@ -13,6 +14,7 @@ export type SendMailFn = (job: EmailJob) => Promise<void>;
 export type EmailLogFn = (
     recipient: string,
     subject: string,
+    type: string,
     status: string,
     errorMessage?: string
 ) => void;
@@ -32,12 +34,13 @@ export class EmailQueue {
 
     constructor(private readonly options: EmailQueueOptions) {}
 
-    enqueue(to: string, subject: string, html: string): void {
+    enqueue(to: string, subject: string, html: string, type = "notification"): void {
         const job: EmailJob = {
             id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
             to,
             subject,
             html,
+            type,
             attempts: 0,
             createdAt: new Date(),
         };
@@ -108,9 +111,23 @@ export class EmailQueue {
         try {
             await this.options.sendMail(job);
 
-            this.options.createEmailLog(job.to, job.subject, "sent");
-
             logInfo("[EmailQueue] Email enviado");
+
+            try {
+                this.options.createEmailLog(
+                    job.to,
+                    job.subject,
+                    job.type,
+                    "sent"
+                );
+            } catch (error) {
+                logError(
+                    "[EmailQueue] No se pudo guardar el log del email",
+                    error
+                );
+            }
+
+            return;
         } catch (error) {
             const message =
                 error instanceof Error ? error.message : "Error desconocido";
@@ -137,8 +154,21 @@ export class EmailQueue {
                 return;
             }
 
-            this.options.createEmailLog(job.to, job.subject, "failed", message);
-
+            try {
+                this.options.createEmailLog(
+                    job.to,
+                    job.subject,
+                    job.type,
+                    "failed",
+                    message
+                );
+            } catch (error) {
+                logError(
+                    "[EmailQueue] No se pudo guardar el log del email",
+                    error
+                );
+            }
+            
             logError(
                 `[EmailQueue] Job descartado tras ${this.options.maxAttempts} intentos`
             );

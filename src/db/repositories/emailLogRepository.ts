@@ -34,6 +34,7 @@ export type EmailLog = {
 export function createEmailLog(
     recipient: string,
     subject: string,
+    type: string,
     status: string,
     errorMessage?: string
 ): void {
@@ -44,6 +45,7 @@ export function createEmailLog(
                 id,
                 recipient,
                 subject,
+                type,
                 status,
                 errorMessage,
                 createdAt
@@ -54,6 +56,7 @@ export function createEmailLog(
             randomUUID(),
             recipient,
             subject,
+            type,
             status,
             errorMessage ?? null,
             new Date().toISOString()
