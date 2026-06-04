@@ -4,31 +4,43 @@ import path from "path";
 import { env } from "../config/env.js";
 import { logWarn } from "../shared/logger.js";
 
-const CHROMIUM_LOCK_FILES = [
-    "SingletonLock",
-    "SingletonCookie",
-    "SingletonSocket",
-];
+function deleteSingletonLocks(directory: string): void {
+    if (!fs.existsSync(directory)) {
+        return;
+    }
 
-/**
- * Elimina locks antiguos de Chromium dentro del perfil de WhatsApp Web
- */
-export function cleanupWhatsAppSessionLocks(): void {
-    const sessionPath = path.resolve(env.WA_SESSION_PATH, "session");
+    const entries = fs.readdirSync(directory, {
+        withFileTypes: true,
+    });
 
-    for (const lockFile of CHROMIUM_LOCK_FILES) {
-        const lockPath = path.join(sessionPath, lockFile);
+    for (const entry of entries) {
+        const entryPath = path.join(directory, entry.name);
+
+        if (entry.isDirectory()) {
+            deleteSingletonLocks(entryPath);
+            continue;
+        }
+
+        if (!entry.name.startsWith("Singleton")) {
+            continue;
+        }
 
         try {
-            if (fs.existsSync(lockPath)) {
-                fs.rmSync(lockPath, {
-                    force: true,
-                });
+            fs.rmSync(entryPath, {
+                force: true,
+            });
 
-                logWarn(`Lock antiguo eliminado: ${lockPath}`);
-            }
+            logWarn(`Lock Chromium eliminado: ${entryPath}`);
         } catch (error) {
-            logWarn(`No se pudo eliminar lock ${lockPath}:`, error);
+            logWarn(`No se pudo eliminar lock Chromium: ${entryPath}`, error);
         }
     }
+}
+
+/**
+ * Elimina locks antiguos de Chromium dentro del perfil de WhatsApp Web.
+ */
+export function cleanupWhatsAppSessionLocks(): void {
+    deleteSingletonLocks(path.resolve(env.WA_SESSION_PATH));
+    deleteSingletonLocks(path.resolve(".wwebjs_cache"));
 }

@@ -48,8 +48,8 @@ export async function killOrphanChromiumProcesses(): Promise<void> {
                 process.kill(Number(pid), "SIGKILL");
 
                 logWarn(`Proceso Chromium eliminado (PID=${pid})`);
-            } catch {
-                // El proceso pudo morir antes
+            } catch (error) {
+                logWarn(`No se pudo eliminar proceso Chromium PID=${pid}`, error);
             }
         }
     } catch (error) {

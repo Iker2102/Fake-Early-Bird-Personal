@@ -38,6 +38,8 @@ export function createEmailLog(
     status: string,
     errorMessage?: string
 ): void {
+    const now = new Date().toISOString();
+
     database
         .prepare(
             `
@@ -47,9 +49,12 @@ export function createEmailLog(
                 subject,
                 type,
                 status,
+                sentAt,
+                success,
+                error,
                 errorMessage,
                 createdAt
-            ) VALUES (?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `
         )
         .run(
@@ -58,8 +63,11 @@ export function createEmailLog(
             subject,
             type,
             status,
+            status === "sent" ? now : now,
+            status === "sent" ? 1 : 0,
+            status === "failed" ? errorMessage ?? "unknown_error" : null,
             errorMessage ?? null,
-            new Date().toISOString()
+            now
         );
 }
 

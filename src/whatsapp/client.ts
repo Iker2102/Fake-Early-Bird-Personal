@@ -197,7 +197,8 @@ try {
         errorMessage.includes("process_singleton") ||
         errorMessage.includes("Code: 21") ||
         errorMessage.includes("Code: 70") ||
-        errorMessage.includes("Code: 71");
+        errorMessage.includes("Code: 71") ||
+        errorMessage.includes("Code: 299");
 
     if (isProfileLockedError) {
         logWarn("Perfil Chromium bloqueado. Limpiando procesos y locks...");
