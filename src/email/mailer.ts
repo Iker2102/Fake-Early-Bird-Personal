@@ -166,3 +166,29 @@ export function sendRetryExhaustedEmail(params: {
 
     emailQueue.enqueue(env.NOTIFY_EMAIL, subject, html);
 }
+
+/**
+ * Envía un resumen diario
+ * @param params 
+ */
+export function sendDailySummaryEmail(params: {
+    sentToday: number;
+    deliveredToday: number;
+    failedToday: number;
+    deliveryRate: number;
+    emailsSentToday: number;
+    date: string;
+}): void {
+    const subject = `Fake Early Bird - Resumen diario ${params.date}`;
+
+    const html = renderEmailTemplate("daily_summary.html", {
+        sentToday: params.sentToday,
+        deliveredToday: params.deliveredToday,
+        failedToday: params.failedToday,
+        deliveryRate: params.deliveryRate,
+        emailsSentToday: params.emailsSentToday,
+        date: params.date,
+    });
+
+    emailQueue.enqueue(env.NOTIFY_EMAIL, subject, html, "daily_summary");
+}

@@ -9,6 +9,7 @@ import { randomBetween } from "../../shared/time.js";
  * Estados disponibles en un mensaje programado
  */
 export type ScheduledMessageStatus = | "scheduled" | "sending" | "sent" | "delivered" | "delivery_failed" | "failed";
+export type RecurrenceType = "none" | "daily" | "weekly" | "monthly";
 /**
  * Representa el mensaje programado alamcenado en la base de datos
  */
@@ -29,6 +30,10 @@ export type ScheduledMessage = {
     retryCount: number;
     notifiedAt: string | null;
     failReason: string | null;
+
+    recurrence: RecurrenceType | null;
+    recurrenceInterval: number | null;
+    parentMessageId: string | null;
 };
 
 /**
@@ -39,6 +44,9 @@ export type CreateScheduledMessageInput = {
     contactName?: string | null;
     message: string;
     scheduledAt: string;
+    recurrence?: RecurrenceType | null;
+    recurrenceInterval?: number | null;
+    parentMessageId?: string | null;
 };
 
 /**
@@ -67,6 +75,10 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
         retryCount: 0,
         notifiedAt: null,
         failReason: null,
+
+        recurrence: input.recurrence ?? "none",
+        recurrenceInterval: input.recurrenceInterval ?? 1,
+        parentMessageId: input.parentMessageId ?? null,
     };
 
     database
@@ -85,7 +97,10 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
                 ackLevel,
                 retryCount,
                 notifiedAt,
-                failReason
+                failReason,
+                recurrence,
+                recurrenceInterval,
+                parentMessageId
             ) VALUES (
                 @id,
                 @phone,
@@ -99,7 +114,10 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
                 @ackLevel,
                 @retryCount,
                 @notifiedAt,
-                @failReason
+                @failReason,
+                @recurrence,
+                @recurrenceInterval,
+                @parentMessageId
             )
             `
         )

@@ -86,6 +86,21 @@
                     <input id="scheduledAt" type="datetime-local" required />
                 </label>
 
+                <label>
+                    Repetición
+                    <select id="recurrence">
+                        <option value="none">No repetir</option>
+                        <option value="daily">Diario</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="monthly">Mensual</option>
+                    </select>
+                </label>
+
+                <label>
+                    Cada
+                    <input id="recurrenceInterval" type="number" min="1" value="1" />
+                </label>
+
                 <label class="full">
                     Mensaje
                     <textarea id="message" rows="4" placeholder="Escribe el mensaje..." required></textarea>

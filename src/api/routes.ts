@@ -96,6 +96,8 @@ apiRouter.post("/messages", (req, res) => {
             contactName: validateOptionalText(req.body.contactName, "contactName", 100),
             message: validateMessage(req.body.message),
             scheduledAt: validateScheduledAt(req.body.scheduledAt),
+            recurrence: req.body.recurrence ?? "none",
+            recurrenceInterval: Number(req.body.recurrenceInterval ?? 1),
         });
 
         res.status(201).json(scheduledMessage);

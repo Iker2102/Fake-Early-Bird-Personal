@@ -167,6 +167,11 @@ async function createScheduledMessage(event) {
     const message = document.getElementById("message").value;
     const scheduledAtInput = document.getElementById("scheduledAt").value;
 
+    const recurrence = document.getElementById("recurrence").value;
+    const recurrenceInterval = Number(
+        document.getElementById("recurrenceInterval").value
+    );
+
     const scheduledAt = new Date(scheduledAtInput).toISOString();
 
     formStatus.textContent = "Programando mensaje...";
@@ -181,6 +186,8 @@ async function createScheduledMessage(event) {
                 phone,
                 message,
                 scheduledAt,
+                recurrence,
+                recurrenceInterval,
             }),
         });
 

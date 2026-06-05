@@ -1,6 +1,7 @@
 import { env } from "../config/env.js";
 import {
     findMessageByWhatsappId,
+    findScheduledMessages,
     markMessageAsAckFailed,
     markMessageAsDelivered,
     requeueMessageByWhatsappId,
@@ -28,8 +29,13 @@ export function registerAckWatcher(client: any): void {
 
     client.on("message_ack", (message: any, ack: number) => {
         const whatsappMessageId = message.id?._serialized;
+        const scheduledMessage = findMessageByWhatsappId(whatsappMessageId);
 
         if (!whatsappMessageId) {
+            return;
+        }
+
+        if(!scheduledMessage) {
             return;
         }
 

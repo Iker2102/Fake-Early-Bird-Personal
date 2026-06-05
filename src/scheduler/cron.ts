@@ -18,6 +18,9 @@ import { canSendByCooldown, canSendByDailyLimit } from "./rules.js";
 import { startDeliveryTimeout } from "../whatsapp/deliveryTimeout.js";
 import { logInfo } from "../shared/logger.js";
 
+import { createScheduledMessage } from "../db/repositories/scheduledMessageRepository.js";
+import { getNextRecurringDate } from "./recurrence.js";
+
 /**
  * Procesa la cola de mensajes pendientes
  * @returns 
@@ -71,6 +74,20 @@ export async function processScheduledMessages(): Promise<void> {
                 const whatsappMessageId = await sendManualMessage(message.phone, message.message);
 
                 markMessageAsSent(message.id, whatsappMessageId);
+
+                const nextScheduledAt = getNextRecurringDate(message);
+
+                if (nextScheduledAt) {
+                    createScheduledMessage({
+                        phone: message.phone,
+                        contactName: message.contactName,
+                        message: message.message,
+                        scheduledAt: nextScheduledAt,
+                        recurrence: message.recurrence,
+                        recurrenceInterval: message.recurrenceInterval,
+                        parentMessageId: message.parentMessageId ?? message.id,
+                    });
+                }
 
                 startDeliveryTimeout(whatsappMessageId);
 

@@ -20,6 +20,8 @@ import { logError, logInfo, logWarn } from "./shared/logger.js";
 
 import { recoverSendingMessagesAfterCrash } from "./db/repositories/scheduledMessageRepository.js";
 
+import { startDailySummaryScheduler } from "./scheduler/dailySummaryCron.js";
+
 
 const app = express();
 
@@ -62,6 +64,11 @@ startScheduler();
  * Inicia el scheduler del backup
  */
 startBackupScheduler();
+
+/**
+ * Inicia el resumen diario
+ */
+startDailySummaryScheduler();
 
 /**
  * Permite recibir peticiones JSON en la API
