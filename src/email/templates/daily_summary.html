@@ -4,36 +4,137 @@
 
 <body style="margin:0;font-family:Arial,sans-serif;background:#f8fafc;color:#111827;">
 
-  <div style="max-width:720px;margin:0 auto;padding:24px;">
+    <div style="max-width:720px;margin:0 auto;padding:24px;">
 
-    <div style="background:#ffffff;border:1px solid #e5e7eb;padding:20px;border-radius:10px;">
+        <div style="
+            background:#ffffff;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            overflow:hidden;
+            box-shadow:0 4px 12px rgba(0,0,0,0.05);
+        ">
 
-      <h1 style="margin:0 0 12px;">Resumen diario</h1>
+            <div style="
+                background:#2563eb;
+                color:white;
+                padding:20px;
+            ">
+                <h1 style="margin:0;font-size:24px;">
+                    📊 Resumen diario
+                </h1>
 
-      <p><strong>Fecha:</strong> {{date}}</p>
+                <p style="margin:8px 0 0;opacity:0.9;">
+                    Fake Early Bird
+                </p>
+            </div>
 
-      <table style="width:100%;border-collapse:collapse;margin-top:16px;">
-        <tr>
-          <td style="padding:10px;border:1px solid #e5e7eb;">Enviados</td>
-          <td style="padding:10px;border:1px solid #e5e7eb;">{{sentCount}}</td>
-        </tr>
-        <tr>
-          <td style="padding:10px;border:1px solid #e5e7eb;">Entregados</td>
-          <td style="padding:10px;border:1px solid #e5e7eb;">{{deliveredCount}}</td>
-        </tr>
-        <tr>
-          <td style="padding:10px;border:1px solid #e5e7eb;">Fallidos</td>
-          <td style="padding:10px;border:1px solid #e5e7eb;">{{failedCount}}</td>
-        </tr>
-        <tr>
-          <td style="padding:10px;border:1px solid #e5e7eb;">Tasa de éxito</td>
-          <td style="padding:10px;border:1px solid #e5e7eb;">{{successRate}}%</td>
-        </tr>
-      </table>
+            <div style="padding:24px;">
+
+                <p style="margin-top:0;">
+                    <strong>Fecha:</strong> {{date}}
+                </p>
+
+                <table
+                    style="
+                        width:100%;
+                        border-collapse:collapse;
+                        margin-top:20px;
+                    "
+                >
+                    <tr>
+                        <td style="padding:12px;border:1px solid #e5e7eb;">
+                            📤 Mensajes enviados
+                        </td>
+
+                        <td style="
+                            padding:12px;
+                            border:1px solid #e5e7eb;
+                            text-align:right;
+                            font-weight:bold;
+                        ">
+                            {{sentToday}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:12px;border:1px solid #e5e7eb;">
+                            ✅ Mensajes entregados
+                        </td>
+
+                        <td style="
+                            padding:12px;
+                            border:1px solid #e5e7eb;
+                            text-align:right;
+                            font-weight:bold;
+                        ">
+                            {{deliveredToday}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:12px;border:1px solid #e5e7eb;">
+                            ❌ Mensajes fallidos
+                        </td>
+
+                        <td style="
+                            padding:12px;
+                            border:1px solid #e5e7eb;
+                            text-align:right;
+                            font-weight:bold;
+                        ">
+                            {{failedToday}}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:12px;border:1px solid #e5e7eb;">
+                            📈 Tasa de entrega
+                        </td>
+
+                        <td style="
+                            padding:12px;
+                            border:1px solid #e5e7eb;
+                            text-align:right;
+                            font-weight:bold;
+                            color:#16a34a;
+                        ">
+                            {{deliveryRate}}%
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:12px;border:1px solid #e5e7eb;">
+                            📧 Emails enviados
+                        </td>
+
+                        <td style="
+                            padding:12px;
+                            border:1px solid #e5e7eb;
+                            text-align:right;
+                            font-weight:bold;
+                        ">
+                            {{emailsSentToday}}
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <div style="
+                padding:16px;
+                background:#f9fafb;
+                border-top:1px solid #e5e7eb;
+                text-align:center;
+                font-size:12px;
+                color:#6b7280;
+            ">
+                Generado automáticamente por Fake Early Bird
+            </div>
+
+        </div>
 
     </div>
-
-  </div>
 
 </body>
 

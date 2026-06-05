@@ -88,6 +88,10 @@ export const env = {
     NOTIFY_ON_SUCCESS: getBooleanEnv("NOTIFY_ON_SUCCESS", false),
 
     LOG_LEVEL: getLogLevelEnv(),
+
+    DAILY_SUMMARY_ENABLED: getBooleanEnv("DAILY_SUMMARY_ENABLED", false),
+    DAILY_SUMMARY_HOUR: getNumberEnv("DAILY_SUMMARY_HOUR", 20),
+    DAILY_SUMMARY_MINUTE: getNumberEnv("DAILY_SUMMARY_MINUTE", 0),
 };
 
 
