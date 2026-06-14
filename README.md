@@ -23,7 +23,7 @@ El objetivo del proyecto es ofrecer una herramienta sencilla para automatizar en
 ## 1. Clonar repositorio
 
 ```bash
-git clone https://github.com/mardev-es/Fake-Early-Bird.git
+git clone https://github.com/Iker2102/Fake-Early-Bird-Personal.git
 ```
 
 ## 2. Entrar al proyecto
@@ -235,7 +235,7 @@ GET /api/logs/stream
 | Integración WhatsApp | ✅ |
 | Scheduler | ✅ |
 | Humanización | ✅ |
-| Sistema de Entregas (ACK) | ⚠️ |
+| Sistema de Entregas (ACK) | ✅ |
 | SMTP y Emails | ✅ |
 | Persistencia y Backups | ✅ |
 | Dashboard Local | ✅ |
