@@ -157,7 +157,7 @@
 - [x] Importación JSON para restaurar estado
 - [x] Resumen diario por email (hora configurable)
 - [x] Página de configuración en dashboard (editar `.env` vía UI)
-- [ ] Multi-device: soporte para más de un número con sesiones separadas
+- [-] Multi-device: soporte para más de un número con sesiones separadas
 
 ---
 

@@ -1,21 +1,30 @@
 import { env } from "../config/env.js";
 import { logInfo } from "../shared/logger.js";
 import { sleep, randomBetween } from "../shared/time.js";
-import { isClientReady, whatsappClient } from "./client.js";
+
+import {
+    getDeviceClient,
+    isDeviceReady,
+} from "./deviceManager.js";
+
 import { whatsappSendLock } from "./sendLock.js";
 
 /**
- * Envía un mensaje manual de WhatsApp a un número concreto
- * 
- * No se hizo con sendPresenceUpdate('composing'), se hizo con typing y pausa proporcional al texto, que es equivalente
- * 
+ * Envía un mensaje manual de WhatsApp desde un dispositivo concreto
+ * @param deviceId 
  * @param phone 
  * @param message 
+ * @returns 
  */
-export async function sendManualMessage(phone: string, message: string): Promise<string> {
-
+export async function sendManualMessage(
+    deviceId: string,
+    phone: string,
+    message: string
+): Promise<string> {
     return whatsappSendLock.runExclusive(async () => {
-        if (!isClientReady() || !whatsappClient) {
+        const client = getDeviceClient(deviceId);
+
+        if (!isDeviceReady(deviceId) || !client) {
             throw new Error("WHATSAPP_NOT_READY");
         }
 
@@ -27,14 +36,16 @@ export async function sendManualMessage(phone: string, message: string): Promise
             env.RANDOM_DELAY_MAX_SECONDS
         );
 
-        logInfo(`Esperando ${delaySeconds}s antes de enviar mensaje`);
+        logInfo(
+            `Esperando ${delaySeconds}s antes de enviar mensaje desde ${deviceId}`
+        );
 
         await sleep(delaySeconds * 1000);
 
         const typingDelay =
             env.TYPING_BASE_DELAY_MS + message.length * env.TYPING_MS_PER_CHAR;
 
-        const chat = await whatsappClient.getChatById(chatId);
+        const chat = await client.getChatById(chatId);
 
         await chat.sendStateTyping();
 
@@ -42,11 +53,10 @@ export async function sendManualMessage(phone: string, message: string): Promise
 
         await chat.clearState();
 
-        const sentMessage = await whatsappClient.sendMessage(chatId, message);
+        const sentMessage = await client.sendMessage(chatId, message);
 
-        logInfo(`Mensaje enviado correctamente`);
+        logInfo(`Mensaje enviado correctamente desde ${deviceId}`);
 
         return sentMessage.id._serialized;
-
     });
 }

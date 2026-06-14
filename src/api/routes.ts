@@ -71,7 +71,7 @@ apiRouter.post("/messages/test-send", async (req, res) => {
         const phone = validatePhone(req.body.phone);
         const message = validateMessage(req.body.message);
 
-        await sendManualMessage(phone, message);
+        await sendManualMessage("default", phone, message);
 
         res.json({
             status: "sent",

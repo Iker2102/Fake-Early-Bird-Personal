@@ -71,7 +71,11 @@ export async function processScheduledMessages(): Promise<void> {
             try {
                 markMessageAsSending(message.id);
 
-                const whatsappMessageId = await sendManualMessage(message.phone, message.message);
+                const whatsappMessageId = await sendManualMessage(
+                    message.deviceId ?? "default",
+                    message.phone, 
+                    message.message
+                );
 
                 markMessageAsSent(message.id, whatsappMessageId);
 

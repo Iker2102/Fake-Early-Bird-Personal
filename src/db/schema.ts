@@ -136,6 +136,7 @@ export function initializeDatabase(): void {
     addColumnIfNotExists("scheduled_messages", "recurrence", "TEXT");
     addColumnIfNotExists("scheduled_messages", "recurrenceInterval", "INTEGER DEFAULT 1");
     addColumnIfNotExists("scheduled_messages", "parentMessageId", "TEXT");
+    addColumnIfNotExists("scheduled_messages", "deviceId", "TEXT DEFAULT 'default'");
 
 
 

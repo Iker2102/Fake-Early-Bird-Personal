@@ -34,6 +34,9 @@ export type ScheduledMessage = {
     recurrence: RecurrenceType | null;
     recurrenceInterval: number | null;
     parentMessageId: string | null;
+
+    deviceId: string;
+
 };
 
 /**
@@ -47,6 +50,7 @@ export type CreateScheduledMessageInput = {
     recurrence?: RecurrenceType | null;
     recurrenceInterval?: number | null;
     parentMessageId?: string | null;
+    deviceId?: string;
 };
 
 /**
@@ -79,6 +83,8 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
         recurrence: input.recurrence ?? "none",
         recurrenceInterval: input.recurrenceInterval ?? 1,
         parentMessageId: input.parentMessageId ?? null,
+
+        deviceId: input.deviceId ?? "default",
     };
 
     database
@@ -100,7 +106,8 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
                 failReason,
                 recurrence,
                 recurrenceInterval,
-                parentMessageId
+                parentMessageId,
+                deviceId
             ) VALUES (
                 @id,
                 @phone,
@@ -117,7 +124,8 @@ export function createScheduledMessage(input: CreateScheduledMessageInput): Sche
                 @failReason,
                 @recurrence,
                 @recurrenceInterval,
-                @parentMessageId
+                @parentMessageId,
+                @deviceId
             )
             `
         )
