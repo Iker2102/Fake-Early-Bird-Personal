@@ -22,6 +22,7 @@ import { recoverSendingMessagesAfterCrash } from "./db/repositories/scheduledMes
 
 import { startDailySummaryScheduler } from "./scheduler/dailySummaryCron.js";
 
+import { initializeDevice } from "./whatsapp/deviceManager.js";
 
 const app = express();
 
@@ -50,7 +51,7 @@ await verifyEmailTransport();
  */
 
 if (env.WA_ENABLED) {
-    void initializeWhatsAppClient();
+    void initializeDevice("default", "Principal");
 } else {
     logInfo("WhatsApp desactivado por configuración");
 }

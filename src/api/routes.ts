@@ -44,6 +44,11 @@ import {
     updateEditableSettings,
 } from "../config/settingsRepository.js";
 
+import {
+    getDevices,
+    initializeDevice,
+} from "../whatsapp/deviceManager.js";
+
 export const apiRouter = Router();
 
 function handleValidationError(error: unknown, res: Response): boolean {
@@ -470,4 +475,26 @@ apiRouter.put("/settings", (req, res) => {
             error: message,
         });
     }
+});
+
+apiRouter.get("/devices", (_req, res) => {
+    res.json(
+        getDevices().map((device) => ({
+            id: device.id,
+            name: device.name,
+            status: device.status,
+            qr: device.qr,
+            isReady: device.isReady,
+        }))
+    );
+});
+
+apiRouter.post("/devices/:id/start", async (req, res) => {
+    const deviceName = req.body?.name ?? req.params.id;
+
+    await initializeDevice(req.params.id, deviceName);
+
+    res.json({
+        status: "initializing",
+    });
 });
