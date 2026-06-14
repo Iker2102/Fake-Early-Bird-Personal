@@ -39,6 +39,11 @@ import {
 import { streamLogs } from "./logStream.js";
 import { logWarn } from "../shared/logger.js";
 
+import {
+    getEditableSettings,
+    updateEditableSettings,
+} from "../config/settingsRepository.js";
+
 export const apiRouter = Router();
 
 function handleValidationError(error: unknown, res: Response): boolean {
@@ -446,3 +451,23 @@ apiRouter.post("/import/full", (req, res) => {
 });
 
 
+apiRouter.get("/settings", (_req, res) => {
+    res.json(getEditableSettings());
+});
+
+apiRouter.put("/settings", (req, res) => {
+    try {
+        updateEditableSettings(req.body ?? {});
+
+        res.json({
+            status: "updated",
+            restartRequired: true,
+        });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+
+        res.status(400).json({
+            error: message,
+        });
+    }
+});

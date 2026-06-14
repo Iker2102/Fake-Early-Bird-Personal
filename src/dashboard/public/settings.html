@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configuración - Fake Early Bird</title>
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+    <main class="dashboard">
+        <header class="header">
+            <div class="header-top">
+                <div>
+                    <h1>Configuración</h1>
+                    <p>Ajustes generales del sistema</p>
+                </div>
+
+                <div class="header-actions">
+                    <a class="nav-link" href="./index.html">Dashboard</a>
+                    <a class="nav-link" href="./contacts.html">Contactos</a>
+                    <a class="nav-link active" href="./settings.html">Configuración</a>
+                </div>
+            </div>
+        </header>
+
+        <section class="card">
+            <h2>Ajustes editables</h2>
+
+            <p class="muted">
+                Estos cambios se guardan en el archivo .env. Algunos ajustes requieren reiniciar la aplicación.
+            </p>
+
+            <form id="settings-form" class="form-grid"></form>
+
+            <p id="settings-status" class="muted"></p>
+        </section>
+    </main>
+
+    <script src="./settings.js"></script>
+</body>
+</html>

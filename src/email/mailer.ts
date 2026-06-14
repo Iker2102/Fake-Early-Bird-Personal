@@ -8,6 +8,7 @@ import { EmailQueue } from "./emailQueue.js";
 
 import { pushLog } from "../api/logStream.js";
 import { logInfo, logWarn } from "../shared/logger.js";
+import { runtimeSettings } from "../config/runtimeSettings.js";
 
 const transporter = nodemailer.createTransport({
     host: env.SMTP_HOST,
@@ -76,7 +77,7 @@ export function sendDisconnectAlertEmail(
     reason: string,
     pendingMessagesCount: number
 ): void {
-    if (!env.NOTIFY_ON_DISCONNECT) {
+    if (!runtimeSettings.NOTIFY_ON_DISCONNECT) {
         return;
     }
 
@@ -103,7 +104,7 @@ export function sendDeliverySuccessEmail(params: {
     ackLabel: string;
     deliveredAt: string;
 }): void {
-    if (!env.NOTIFY_ON_SUCCESS) {
+    if (!runtimeSettings.NOTIFY_ON_SUCCESS) {
         return;
     }
 

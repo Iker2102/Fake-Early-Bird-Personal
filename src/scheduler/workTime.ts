@@ -1,4 +1,5 @@
 import { env } from "../config/env.js";
+import { runtimeSettings } from "../config/runtimeSettings.js";
 
 /**
  * Devuelve la hora actual en el timezone configurado
@@ -31,7 +32,7 @@ export function isWeekend(date: Date): boolean {
 export function isWithinWorkHours(date: Date): boolean {
     const hour = date.getHours();
 
-    return hour >= env.WORK_HOURS_START && hour < env.WORK_HOURS_END;
+    return hour >= runtimeSettings.WORK_HOURS_START && hour < runtimeSettings.WORK_HOURS_END;
 }
 
 /**

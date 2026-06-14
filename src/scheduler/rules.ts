@@ -1,4 +1,4 @@
-import { env } from "../config/env.js";
+import { runtimeSettings } from "../config/runtimeSettings.js";
 
 import {
     countMessagesSentTodayByPhone,
@@ -21,7 +21,7 @@ export function canSendByCooldown(message: ScheduledMessage): boolean {
     const lastSentAt = new Date(lastSentMessage.sentAt).getTime();
     const now = Date.now();
 
-    const cooldownMs = env.CONTACT_COOLDOWN_MINUTES * 60 * 1000;
+    const cooldownMs = runtimeSettings.CONTACT_COOLDOWN_MINUTES * 60 * 1000;
 
     return now - lastSentAt >= cooldownMs;
 }
@@ -46,5 +46,5 @@ export function canSendByDailyLimit(message: ScheduledMessage): boolean {
         dayEnd.toISOString()
     );
 
-    return sentToday < env.MAX_MESSAGES_PER_CONTACT_PER_DAY;
+    return sentToday < runtimeSettings.MAX_MESSAGES_PER_CONTACT_PER_DAY;
 }

@@ -2,8 +2,8 @@ import { randomUUID } from "crypto";
 
 import { database } from "../database.js";
 
-import { env } from "../../config/env.js";
 import { randomBetween } from "../../shared/time.js";
+import { runtimeSettings } from "../../config/runtimeSettings.js";
 
 /**
  * Estados disponibles en un mensaje programado
@@ -310,7 +310,7 @@ export function countMessagesSentTodayByPhone(phone: string, dayStart: string, d
  * @returns 
  */
 function applyScheduleVariation(scheduledAt: string): string {
-    const variationMinutes = env.SCHEDULE_VARIATION_MINUTES;
+    const variationMinutes = runtimeSettings.SCHEDULE_VARIATION_MINUTES;
 
     if (variationMinutes <= 0) {
         return scheduledAt;
